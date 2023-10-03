@@ -1,6 +1,6 @@
 package com.example.rickandmortyapiproject.network
 
-import com.example.rickandmortyapiproject.models.CharactersApiResponse
+import com.example.rickandmortyapiproject.models.*
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -31,6 +31,19 @@ interface ApiService {
         @Query("type") type: String? = null,
         @Query("gender") gender: String? = null,
     ): CharactersApiResponse
+
+    @GET("location")
+    suspend fun getLocations(
+        @Query("name") name: String?,
+        @Query("type") type: String?,
+        @Query("dimension") dimension: String?,
+    ): LocationApiResponse
+
+    @GET("episode")
+    suspend fun getEpisodes(
+        @Query("name") name: String?,
+        @Query("episode") episode: String?,
+    ): EpisodesApiResponse
 }
 
 object RNMApi {

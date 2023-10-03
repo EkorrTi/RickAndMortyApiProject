@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.rickandmortyapiproject.databinding.FragmentLocationsBinding
+import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 
 class LocationsFragment : Fragment() {
 
-    private var _binding: FragmentLocationsBinding? = null
+    private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -17,7 +17,7 @@ class LocationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLocationsBinding.inflate(inflater, container, false)
+        _binding = FragmentRecyclerListBinding.inflate(inflater, container, false)
         return binding.root
     }
 

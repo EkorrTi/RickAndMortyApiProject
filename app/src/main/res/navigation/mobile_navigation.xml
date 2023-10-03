@@ -9,17 +9,17 @@
         android:id="@+id/navigation_characters"
         android:name="com.example.rickandmortyapiproject.ui.characters.CharactersFragment"
         android:label="@string/title_characters"
-        tools:layout="@layout/fragment_characters" />
+        tools:layout="@layout/fragment_recycler_list" />
 
     <fragment
         android:id="@+id/navigation_locations"
         android:name="com.example.rickandmortyapiproject.ui.locations.LocationsFragment"
         android:label="@string/title_locations"
-        tools:layout="@layout/fragment_locations" />
+        tools:layout="@layout/fragment_recycler_list" />
 
     <fragment
         android:id="@+id/navigation_episodes"
         android:name="com.example.rickandmortyapiproject.ui.episodes.EpisodesFragment"
         android:label="@string/title_episodes"
-        tools:layout="@layout/fragment_episodes" />
+        tools:layout="@layout/fragment_recycler_list" />
 </navigation>

@@ -12,7 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
-import com.example.rickandmortyapiproject.databinding.FragmentCharactersBinding
+import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.models.CharactersApiResponse
 import com.example.rickandmortyapiproject.ui.characters.CharactersViewModel.CharactersState
 import kotlinx.coroutines.cancel
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class CharactersFragment : Fragment() {
 
-    private var _binding: FragmentCharactersBinding? = null
+    private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CharactersViewModel by viewModels()
 
@@ -34,7 +34,7 @@ class CharactersFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCharactersBinding.inflate(inflater, container, false)
+        _binding = FragmentRecyclerListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
