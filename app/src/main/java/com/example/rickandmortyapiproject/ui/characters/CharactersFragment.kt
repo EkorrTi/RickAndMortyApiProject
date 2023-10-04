@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.models.CharactersApiResponse
@@ -40,7 +41,11 @@ class CharactersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = CharactersListAdapter()
-        // adapter.onClick = {}
+        adapter.onClick = {
+            val action = CharactersFragmentDirections
+                .actionNavigationCharactersToCharacterDetailsFragment(it)
+            findNavController().navigate(action)
+        }
         binding.recyclerView.adapter = adapter
 
         lifecycleScope.launch {

@@ -1,5 +1,7 @@
 package com.example.rickandmortyapiproject.models
 
+import java.io.Serializable
+
 data class Character(
     val id: Int,
     val name: String,
@@ -11,7 +13,7 @@ data class Character(
     val location: CharacterDetails,
     val image: String,
     val episode: List<String>,
-)
+): Serializable
 
 data class CharacterDetails(
     val name: String,

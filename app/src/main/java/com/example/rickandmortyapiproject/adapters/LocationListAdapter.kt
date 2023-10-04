@@ -10,6 +10,7 @@ import com.example.rickandmortyapiproject.models.Location
 
 class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationListViewHolder>() {
     var data: List<Location> = emptyList()
+    var onClick: ((loc: Location) -> Unit) = {}
 
     override fun onBindViewHolder(holder: LocationListViewHolder, position: Int) {
         val l = data[position]
@@ -18,6 +19,7 @@ class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationList
             name.text = l.name
             type.text = l.type
             dimension.text = l.dimension
+            itemView.setOnClickListener { onClick(l) }
         }
     }
 

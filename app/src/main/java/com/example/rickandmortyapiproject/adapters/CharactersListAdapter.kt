@@ -1,5 +1,6 @@
 package com.example.rickandmortyapiproject.adapters
 
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,10 @@ import coil.load
 import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.models.Character
 
-class CharactersListAdapter : RecyclerView.Adapter<CharactersListAdapter.CharacterListViewHolder>() {
+class CharactersListAdapter :
+    RecyclerView.Adapter<CharactersListAdapter.CharacterListViewHolder>() {
     var data: List<Character> = emptyList()
+    var onClick: ((ch: Character) -> Unit) = {}
 
     override fun onBindViewHolder(holder: CharacterListViewHolder, position: Int) {
         val ch = data[position]
@@ -19,9 +22,19 @@ class CharactersListAdapter : RecyclerView.Adapter<CharactersListAdapter.Charact
         holder.apply {
             image.load(ch.image)
             name.text = ch.name
-            species.text = ch.species
-            status.text = ch.status
-            gender.text = ch.gender
+            species.text = Html.fromHtml(
+                itemView.resources.getString(R.string.character_species, ch.species),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+            status.text = Html.fromHtml(
+                itemView.resources.getString(R.string.character_status, ch.status),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+            gender.text = Html.fromHtml(
+                itemView.resources.getString(R.string.character_gender, ch.gender),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+            itemView.setOnClickListener { onClick(ch) }
         }
     }
 
@@ -33,7 +46,7 @@ class CharactersListAdapter : RecyclerView.Adapter<CharactersListAdapter.Charact
         return CharacterListViewHolder(adapterLayout)
     }
 
-    class CharacterListViewHolder(view: View) : RecyclerView.ViewHolder(view){
+    class CharacterListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.image_view)
         val name: TextView = view.findViewById(R.id.name_text_view)
         val species: TextView = view.findViewById(R.id.species_text_view)

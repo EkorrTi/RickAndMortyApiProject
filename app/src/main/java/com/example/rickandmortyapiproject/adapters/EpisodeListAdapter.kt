@@ -10,6 +10,7 @@ import com.example.rickandmortyapiproject.models.Episode
 
 class EpisodeListAdapter: RecyclerView.Adapter<EpisodeListAdapter.EpisodeListViewHolder>() {
     var data: List<Episode> = emptyList()
+    var onClick: ((ep: Episode) -> Unit) = {}
 
     override fun onBindViewHolder(holder: EpisodeListViewHolder, position: Int) {
         val ep = data[position]
@@ -18,6 +19,7 @@ class EpisodeListAdapter: RecyclerView.Adapter<EpisodeListAdapter.EpisodeListVie
             name.text = ep.name
             number.text = ep.episode
             date.text = ep.airDate
+            itemView.setOnClickListener { onClick(ep) }
         }
     }
 
