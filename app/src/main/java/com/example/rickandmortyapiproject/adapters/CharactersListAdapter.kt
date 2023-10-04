@@ -16,11 +16,13 @@ class CharactersListAdapter : RecyclerView.Adapter<CharactersListAdapter.Charact
     override fun onBindViewHolder(holder: CharacterListViewHolder, position: Int) {
         val ch = data[position]
 
-        holder.image.load(ch.image)
-        holder.name.text = ch.name
-        holder.species.text = ch.species
-        holder.status.text = ch.status
-        holder.gender.text = ch.gender
+        holder.apply {
+            image.load(ch.image)
+            name.text = ch.name
+            species.text = ch.species
+            status.text = ch.status
+            gender.text = ch.gender
+        }
     }
 
     override fun getItemCount(): Int = data.size

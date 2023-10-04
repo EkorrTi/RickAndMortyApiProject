@@ -5,7 +5,7 @@ data class CharactersApiResponse(
     val results: List<Character>,
 )
 
-data class LocationApiResponse(
+data class LocationsApiResponse(
     val info: ResponseInfo,
     val results: List<Location>
 )

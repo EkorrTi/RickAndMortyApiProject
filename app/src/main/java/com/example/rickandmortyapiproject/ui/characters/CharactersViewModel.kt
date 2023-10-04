@@ -22,12 +22,21 @@ class CharactersViewModel: ViewModel() {
         data class Error(val error: Throwable): CharactersState()
     }
 
-    fun get(){
+    fun get(
+        page: Int? = null,
+        name: String? = null,
+        status: String? = null,
+        species: String? = null,
+        type: String? = null,
+        gender: String? = null,
+    ){
         viewModelScope.launch {
             Log.i(TAG, "Fetching characters")
             _responseState.value = CharactersState.Loading
             try {
-                _responseState.value = CharactersState.Success(RNMApi.retrofitService.getCharacters())
+                _responseState.value = CharactersState.Success(
+                    RNMApi.retrofitService.getCharacters(page, name, status, species, type, gender)
+                )
                 Log.i(TAG, responseState.value.toString())
             } catch (e: Exception){
                 Log.w(TAG, e)

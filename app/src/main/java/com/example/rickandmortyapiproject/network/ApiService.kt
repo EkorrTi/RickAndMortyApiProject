@@ -24,23 +24,25 @@ private val retrofit = Retrofit.Builder()
 interface ApiService {
     @GET("character")
     suspend fun getCharacters(
-        @Query("page") page: Int? = null,
-        @Query("name") name: String? = null,
-        @Query("status") status: String? = null,
-        @Query("species") species: String? = null,
-        @Query("type") type: String? = null,
-        @Query("gender") gender: String? = null,
+        @Query("page") page: Int?,
+        @Query("name") name: String?,
+        @Query("status") status: String?,
+        @Query("species") species: String?,
+        @Query("type") type: String?,
+        @Query("gender") gender: String?,
     ): CharactersApiResponse
 
     @GET("location")
     suspend fun getLocations(
+        @Query("page") page: Int? = null,
         @Query("name") name: String?,
         @Query("type") type: String?,
         @Query("dimension") dimension: String?,
-    ): LocationApiResponse
+    ): LocationsApiResponse
 
     @GET("episode")
     suspend fun getEpisodes(
+        @Query("page") page: Int? = null,
         @Query("name") name: String?,
         @Query("episode") episode: String?,
     ): EpisodesApiResponse
