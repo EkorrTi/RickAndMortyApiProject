@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,8 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.models.EpisodesApiResponse
-import com.example.rickandmortyapiproject.ui.episodes.EpisodesViewModel.EpisodesState
+import com.example.rickandmortyapiproject.ui.utils.Utils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -42,20 +40,33 @@ class EpisodesFragment : Fragment() {
         val adapter = EpisodeListAdapter()
         // adapter.onClick = {}
         binding.recyclerView.adapter = adapter
+        observeEpisodes()
 
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.get()
+            observeEpisodes()
+            binding.swipeRefresh.isRefreshing = false
+        }
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun observeEpisodes() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseState.collect { state ->
-                    binding.progressCircular.isGone = state !is EpisodesState.Loading
+                    binding.progressCircular.isGone =
+                        state !is EpisodesViewModel.EpisodesState.Loading
                     when (state) {
-                        is EpisodesState.Success -> {
-                            onSuccessfulResponse(state.result)
+                        is EpisodesViewModel.EpisodesState.Success -> {
+                            (binding.recyclerView.adapter as EpisodeListAdapter)
+                                .data = state.result.results
                             cancel("Successful")
                         }
 
-                        is EpisodesState.Error -> {
-                            onErrorResponse(state.error)
-                            cancel("Error")
+                        is EpisodesViewModel.EpisodesState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.error)
+                            cancel("Error", state.error)
                         }
 
                         else -> Unit
@@ -63,19 +74,6 @@ class EpisodesFragment : Fragment() {
                 }
             }
         }
-
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    private fun onSuccessfulResponse(response: EpisodesApiResponse) {
-        (binding.recyclerView.adapter as EpisodeListAdapter).apply {
-            data = response.results
-            notifyDataSetChanged()
-        }
-    }
-
-    private fun onErrorResponse(e: Throwable) {
-        Toast.makeText(requireContext(), "Error $e", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -1,45 +1,70 @@
 package com.example.rickandmortyapiproject.ui.characterDetails
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmortyapiproject.models.Character
 import com.example.rickandmortyapiproject.models.Episode
 import com.example.rickandmortyapiproject.network.RNMApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 private const val ID_START_INDEX = 40
+private const val TAG = "CharacterDetail"
 
 class CharacterDetailsViewModel : ViewModel() {
-    private val _responseCharacter = MutableLiveData<Character>()
-    val responseCharacter: LiveData<Character> get() = _responseCharacter
+    private val _responseCharacterState =
+        MutableStateFlow<CharacterDetailState>(CharacterDetailState.Empty)
+    val responseCharacterState = _responseCharacterState.asStateFlow()
 
-    private val _responseEpisodes = MutableLiveData<List<Episode>>()
-    val responseEpisodes: LiveData<List<Episode>> get() = _responseEpisodes
+    sealed class CharacterDetailState {
+        object Empty : CharacterDetailState()
+        object Loading : CharacterDetailState()
+        data class Success(val result: Character) : CharacterDetailState()
+        data class SuccessAppearances(val result: List<Episode>) : CharacterDetailState()
+        data class Error(val error: Throwable) : CharacterDetailState()
+    }
+
+    private val _responseEpisodesState =
+        MutableStateFlow<CharacterDetailState>(CharacterDetailState.Empty)
+    val responseEpisodesState = _responseEpisodesState.asStateFlow()
 
     fun getCharacter(id: Int) {
         viewModelScope.launch {
-            Log.i("ChD", "sending the request")
+            Log.i(TAG, "sending the request")
+            _responseCharacterState.value = CharacterDetailState.Loading
             try {
-                _responseCharacter.value = RNMApi.retrofitService.getCharacter(id)
-            } catch (e: Exception){
-                Log.w("ChD", e)
+                _responseCharacterState.value = CharacterDetailState.Success(
+                    RNMApi.retrofitService.getCharacter(id)
+                )
+                Log.i(TAG, responseCharacterState.value.toString())
+                getAppearances(
+                    (_responseCharacterState.value as CharacterDetailState.Success)
+                        .result.episode
+                )
+            } catch (e: Exception) {
+                Log.w(TAG, e)
+                _responseCharacterState.value = CharacterDetailState.Error(e)
             }
         }
     }
 
-    fun getEpisodes(episodes: List<String>) {
+    private fun getAppearances(episodes: List<String>) {
         val ids = mutableListOf<Int>()
         for (e in episodes) ids.add(e.substring(ID_START_INDEX).toInt())
-        Log.i("ChD", "Extracted episode ids: $ids")
+        Log.i(TAG, "Extracted episode ids: $ids")
 
         viewModelScope.launch {
+            _responseEpisodesState.value = CharacterDetailState.Loading
             try {
-                _responseEpisodes.value = RNMApi.retrofitService.getEpisodesList(ids)
-            } catch (e: Exception){
-                Log.w("ChD", e)
+                _responseEpisodesState.value = CharacterDetailState.SuccessAppearances(
+                    RNMApi.retrofitService.getEpisodesList(ids)
+                )
+                Log.i(TAG, responseEpisodesState.value.toString())
+            } catch (e: Exception) {
+                Log.w(TAG, e)
+                _responseEpisodesState.value = CharacterDetailState.Error(e)
             }
         }
     }

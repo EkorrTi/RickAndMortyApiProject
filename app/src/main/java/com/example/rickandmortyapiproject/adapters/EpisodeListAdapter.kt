@@ -10,6 +10,10 @@ import com.example.rickandmortyapiproject.models.Episode
 
 class EpisodeListAdapter: RecyclerView.Adapter<EpisodeListAdapter.EpisodeListViewHolder>() {
     var data: List<Episode> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
     var onClick: ((ep: Episode) -> Unit) = {}
 
     override fun onBindViewHolder(holder: EpisodeListViewHolder, position: Int) {

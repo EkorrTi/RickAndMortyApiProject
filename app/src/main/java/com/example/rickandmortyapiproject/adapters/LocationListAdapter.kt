@@ -10,6 +10,10 @@ import com.example.rickandmortyapiproject.models.Location
 
 class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationListViewHolder>() {
     var data: List<Location> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
     var onClick: ((loc: Location) -> Unit) = {}
 
     override fun onBindViewHolder(holder: LocationListViewHolder, position: Int) {

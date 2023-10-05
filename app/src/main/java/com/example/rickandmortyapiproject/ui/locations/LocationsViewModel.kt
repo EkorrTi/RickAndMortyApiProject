@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val TAG = "Locations Response"
+private const val TAG = "LocationsList"
 
 class LocationsViewModel: ViewModel() {
     private val _responseState = MutableStateFlow<LocationsState>(LocationsState.Empty)

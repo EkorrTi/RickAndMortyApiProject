@@ -19,7 +19,11 @@
         android:id="@+id/navigation_locations"
         android:name="com.example.rickandmortyapiproject.ui.locations.LocationsFragment"
         android:label="@string/title_locations"
-        tools:layout="@layout/fragment_recycler_list" />
+        tools:layout="@layout/fragment_recycler_list" >
+        <action
+            android:id="@+id/action_navigation_locations_to_locationDetailsFragment"
+            app:destination="@id/locationDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_episodes"
@@ -35,5 +39,17 @@
         <argument
             android:name="id"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/locationDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.locationDetails.LocationDetailsFragment"
+        android:label="fragment_location_details"
+        tools:layout="@layout/fragment_location_details" >
+        <argument
+            android:name="id"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_locationDetailsFragment_to_characterDetailsFragment"
+            app:destination="@id/characterDetailsFragment" />
     </fragment>
 </navigation>

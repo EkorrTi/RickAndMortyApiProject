@@ -14,6 +14,10 @@ import com.example.rickandmortyapiproject.models.Character
 class CharactersListAdapter :
     RecyclerView.Adapter<CharactersListAdapter.CharacterListViewHolder>() {
     var data: List<Character> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
     var onClick: ((ch: Character) -> Unit) = {}
 
     override fun onBindViewHolder(holder: CharacterListViewHolder, position: Int) {

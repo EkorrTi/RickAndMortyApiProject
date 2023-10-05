@@ -5,21 +5,26 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import coil.load
 import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentCharacterDetailsBinding
 import com.example.rickandmortyapiproject.models.Character
+import com.example.rickandmortyapiproject.ui.utils.Utils
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class CharacterDetailsFragment : Fragment() {
     private var id: Int = 0
     private var _binding: FragmentCharacterDetailsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CharacterDetailsViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,19 +43,33 @@ class CharacterDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = EpisodeListAdapter()
         binding.recyclerView.adapter = adapter
-
-        viewModel.responseCharacter.observe(viewLifecycleOwner) {
-            showCharacter(it)
-            viewModel.getEpisodes(it.episode)
-            binding.progressCircularMain.isVisible = false
-        }
-        viewModel.responseEpisodes.observe(viewLifecycleOwner) {
-            adapter.data = it
-            adapter.notifyDataSetChanged()
-            binding.progressCircularSub.isVisible = false
-        }
+        observeCharacter()
+        observeAppearances()
 
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun observeCharacter(){
+        lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.responseCharacterState.collect{ state ->
+                    binding.progressCircularMain.isGone = state !is CharacterDetailsViewModel.CharacterDetailState.Loading
+                    when (state) {
+                        is CharacterDetailsViewModel.CharacterDetailState.Success -> {
+                            showCharacter(state.result)
+                            cancel("Successful")
+                        }
+
+                        is CharacterDetailsViewModel.CharacterDetailState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.error)
+                            cancel("Error", state.error)
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 
     private fun showCharacter(character: Character){
@@ -82,5 +101,27 @@ class CharacterDetailsFragment : Fragment() {
             resources.getString(R.string.character_location, character.location.name),
             Html.FROM_HTML_MODE_LEGACY
         )
+    }
+
+    private fun observeAppearances(){
+        lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.responseEpisodesState.collect{ state ->
+                    binding.progressCircularSub.isGone = state !is CharacterDetailsViewModel.CharacterDetailState.Loading
+                    when (state) {
+                        is CharacterDetailsViewModel.CharacterDetailState.SuccessAppearances -> {
+                            (binding.recyclerView.adapter as EpisodeListAdapter)
+                                .data = state.result
+                            cancel("Success")
+                        }
+                        is CharacterDetailsViewModel.CharacterDetailState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.error)
+                            cancel("Error", state.error)
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 }

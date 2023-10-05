@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val TAG = "Episodes Response"
+private const val TAG = "EpisodesList"
 
 class EpisodesViewModel: ViewModel() {
     private val _responseState = MutableStateFlow<EpisodesState>(EpisodesState.Empty)

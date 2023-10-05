@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val TAG = "Characters Response"
+private const val TAG = "CharactersList"
 
 class CharactersViewModel: ViewModel() {
     private val _responseState = MutableStateFlow<CharactersState>(CharactersState.Empty)

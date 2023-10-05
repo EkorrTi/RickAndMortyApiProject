@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,8 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.models.CharactersApiResponse
-import com.example.rickandmortyapiproject.ui.characters.CharactersViewModel.CharactersState
+import com.example.rickandmortyapiproject.ui.utils.Utils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -47,20 +45,33 @@ class CharactersFragment : Fragment() {
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
+        observeCharacters()
 
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.get()
+            observeCharacters()
+            binding.swipeRefresh.isRefreshing = false
+        }
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun observeCharacters() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseState.collect { state ->
-                    binding.progressCircular.isGone = state !is CharactersState.Loading
+                    binding.progressCircular.isGone =
+                        state !is CharactersViewModel.CharactersState.Loading
                     when (state) {
-                        is CharactersState.Success -> {
-                            onSuccessfulResponse(state.result)
+                        is CharactersViewModel.CharactersState.Success -> {
+                            (binding.recyclerView.adapter as CharactersListAdapter)
+                                .data = state.result.results
                             cancel("Successful")
                         }
 
-                        is CharactersState.Error -> {
-                            onErrorResponse(state.error)
-                            cancel("Error")
+                        is CharactersViewModel.CharactersState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.error)
+                            cancel("Error", state.error)
                         }
 
                         else -> Unit
@@ -68,19 +79,6 @@ class CharactersFragment : Fragment() {
                 }
             }
         }
-
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    private fun onSuccessfulResponse(response: CharactersApiResponse) {
-        (binding.recyclerView.adapter as CharactersListAdapter).apply {
-            data = response.results
-            notifyDataSetChanged()
-        }
-    }
-
-    private fun onErrorResponse(e: Throwable) {
-        Toast.makeText(requireContext(), "Error $e", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
