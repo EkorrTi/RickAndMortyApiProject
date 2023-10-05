@@ -29,11 +29,11 @@
 
     <fragment
         android:id="@+id/characterDetailsFragment"
-        android:name="com.example.rickandmortyapiproject.ui.characters.CharacterDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.characterDetails.CharacterDetailsFragment"
         android:label="fragment_character_details"
         tools:layout="@layout/fragment_character_details" >
         <argument
-            android:name="character"
-            app:argType="com.example.rickandmortyapiproject.models.Character" />
+            android:name="id"
+            app:argType="integer" />
     </fragment>
 </navigation>

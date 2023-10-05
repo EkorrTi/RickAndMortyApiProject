@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/fragment_horizontal_padding"
     android:paddingTop="@dimen/fragment_top_padding"
-    tools:context=".ui.characters.CharacterDetailsFragment">
+    tools:context=".ui.characterDetails.CharacterDetailsFragment">
 
     <TextView
         android:id="@+id/character_name"
@@ -85,4 +85,42 @@
         app:layout_constraintStart_toStartOf="@id/character_status"
         app:layout_constraintTop_toBottomOf="@+id/character_origin"
         tools:text="Location: Earth" />
+
+    <TextView
+        android:id="@+id/character_appearances"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/appearances"
+        android:textSize="@dimen/details_text"
+        app:layout_constraintStart_toStartOf="@+id/character_status"
+        app:layout_constraintTop_toBottomOf="@+id/character_location" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/character_appearances"
+        tools:itemCount="3"
+        tools:listitem="@layout/episode_list_item" />
+
+    <ProgressBar
+        android:id="@+id/progress_circular_main"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progress_circular_sub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_m"
+        app:layout_constraintStart_toEndOf="@+id/character_appearances"
+        app:layout_constraintTop_toBottomOf="@+id/character_location" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
