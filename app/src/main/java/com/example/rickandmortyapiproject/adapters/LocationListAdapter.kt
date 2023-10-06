@@ -1,5 +1,6 @@
 package com.example.rickandmortyapiproject.adapters
 
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +18,19 @@ class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationList
     var onClick: ((loc: Location) -> Unit) = {}
 
     override fun onBindViewHolder(holder: LocationListViewHolder, position: Int) {
-        val l = data[position]
+        val loc = data[position]
 
         holder.apply {
-            name.text = l.name
-            type.text = l.type
-            dimension.text = l.dimension
-            itemView.setOnClickListener { onClick(l) }
+            name.text = loc.name
+            type.text = Html.fromHtml(
+                this.itemView.context.getString(R.string.type, loc.type),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+            dimension.text = Html.fromHtml(
+                this.itemView.context.getString(R.string.location_dimension, loc.dimension),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+            itemView.setOnClickListener { onClick(loc) }
         }
     }
 

@@ -53,6 +53,7 @@ class LocationDetailsViewModel : ViewModel() {
         if (characters.isEmpty()){
             Log.i(TAG, "Residents empty")
             _responseResidentsState.value = LocationDetailState.NoResidents
+            return
         }
         val ids = mutableListOf<Int>()
         for (c in characters) ids.add(c.substring(ID_START_INDEX).toInt())

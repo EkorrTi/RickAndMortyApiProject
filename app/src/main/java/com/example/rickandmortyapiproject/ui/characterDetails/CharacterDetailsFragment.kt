@@ -86,7 +86,7 @@ class CharacterDetailsFragment : Fragment() {
         binding.characterType.text =
             if (character.type.isBlank()) resources.getText(R.string.character_type_standard)
             else Html.fromHtml(
-                resources.getString(R.string.character_type, character.type),
+                resources.getString(R.string.type, character.type),
                 Html.FROM_HTML_MODE_LEGACY
             )
         binding.characterGender.text = Html.fromHtml(

@@ -6,12 +6,13 @@
     <string name="character_image">Character image</string>
     <string name="character_species">&lt;b>Species:&lt;/b> %s</string>
     <string name="character_status">&lt;b>Status:&lt;/b> %s</string>
-    <string name="character_type">&lt;b>Type:&lt;/b> %s</string>
+    <string name="type">&lt;b>Type:&lt;/b> %s</string>
     <string name="character_type_standard"><b>Type:</b> Standard</string>
     <string name="character_gender">&lt;b>Gender:&lt;/b> %s</string>
     <string name="character_origin">&lt;b>Origin:&lt;/b> &lt;u>%s&lt;/u></string>
     <string name="character_location">&lt;b>Current Location:&lt;/b> &lt;u>%s&lt;/u></string>
     <string name="character_appearances"><b>Appearances:</b></string>
+    <string name="location_dimension">&lt;b>Dimension:&lt;/b> %s</string>
     <string name="location_residents"><b>Residents:</b></string>
     <string name="episode_characters"><b>Characters:</b></string>
     <string name="ok">OK</string>

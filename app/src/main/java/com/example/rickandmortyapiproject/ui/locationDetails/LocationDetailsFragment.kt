@@ -1,6 +1,7 @@
 package com.example.rickandmortyapiproject.ui.locationDetails
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentLocationDetailsBinding
 import com.example.rickandmortyapiproject.models.Location
@@ -78,8 +80,14 @@ class LocationDetailsFragment : Fragment() {
 
     private fun showLocation(loc: Location){
         binding.locationName.text = loc.name
-        binding.locationType.text = loc.type
-        binding.locationDimension.text = loc.dimension
+        binding.locationType.text = Html.fromHtml(
+            getString(R.string.type, loc.type),
+            Html.FROM_HTML_MODE_LEGACY
+        )
+        binding.locationDimension.text = Html.fromHtml(
+            getString(R.string.location_dimension, loc.dimension),
+            Html.FROM_HTML_MODE_LEGACY
+        )
     }
 
     private fun observeResidents(){
