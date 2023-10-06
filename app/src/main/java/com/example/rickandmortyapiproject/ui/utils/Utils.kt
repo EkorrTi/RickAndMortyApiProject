@@ -6,6 +6,10 @@ import androidx.appcompat.app.AlertDialog
 import com.example.rickandmortyapiproject.R
 
 object Utils {
+    const val ID_START_INDEX_CHARACTER = 42
+    const val ID_START_INDEX_LOCATION = 41
+    const val ID_START_INDEX_EPISODE = 40
+
     fun onErrorResponse(context: Context, e: Throwable) {
         if (e.message == "timeout")
             showAlertDialog(context, R.string.timeout_exception)

@@ -29,7 +29,11 @@
         android:id="@+id/navigation_episodes"
         android:name="com.example.rickandmortyapiproject.ui.episodes.EpisodesFragment"
         android:label="@string/title_episodes"
-        tools:layout="@layout/fragment_recycler_list" />
+        tools:layout="@layout/fragment_recycler_list" >
+        <action
+            android:id="@+id/action_navigation_episodes_to_episodeDetailsFragment"
+            app:destination="@id/episodeDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/characterDetailsFragment"
@@ -39,6 +43,12 @@
         <argument
             android:name="id"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_characterDetailsFragment_to_episodeDetailsFragment"
+            app:destination="@id/episodeDetailsFragment" />
+        <action
+            android:id="@+id/action_characterDetailsFragment_to_locationDetailsFragment"
+            app:destination="@id/locationDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/locationDetailsFragment"
@@ -50,6 +60,18 @@
             app:argType="integer" />
         <action
             android:id="@+id/action_locationDetailsFragment_to_characterDetailsFragment"
+            app:destination="@id/characterDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/episodeDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.episodeDetails.EpisodeDetailsFragment"
+        android:label="fragment_episode_details"
+        tools:layout="@layout/fragment_episode_details" >
+        <argument
+            android:name="id"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_episodeDetailsFragment_to_characterDetailsFragment"
             app:destination="@id/characterDetailsFragment" />
     </fragment>
 </navigation>

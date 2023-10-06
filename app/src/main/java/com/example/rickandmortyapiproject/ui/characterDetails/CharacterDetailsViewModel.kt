@@ -6,11 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.rickandmortyapiproject.models.Character
 import com.example.rickandmortyapiproject.models.Episode
 import com.example.rickandmortyapiproject.network.RNMApi
+import com.example.rickandmortyapiproject.ui.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val ID_START_INDEX = 40
 private const val TAG = "CharacterDetail"
 
 class CharacterDetailsViewModel : ViewModel() {
@@ -52,7 +52,7 @@ class CharacterDetailsViewModel : ViewModel() {
 
     private fun getAppearances(episodes: List<String>) {
         val ids = mutableListOf<Int>()
-        for (e in episodes) ids.add(e.substring(ID_START_INDEX).toInt())
+        for (e in episodes) ids.add(e.substring(Utils.ID_START_INDEX_EPISODE).toInt())
         Log.i(TAG, "Extracted episode ids: $ids")
 
         viewModelScope.launch {

@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
@@ -42,6 +43,10 @@ class CharacterDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = EpisodeListAdapter()
+        adapter.onClick = {
+            val action = CharacterDetailsFragmentDirections.actionCharacterDetailsFragmentToEpisodeDetailsFragment(it.id)
+            findNavController().navigate(action)
+        }
         binding.recyclerView.adapter = adapter
         observeCharacter()
         observeAppearances()
@@ -97,10 +102,24 @@ class CharacterDetailsFragment : Fragment() {
             resources.getString(R.string.character_origin, character.origin.name),
             Html.FROM_HTML_MODE_LEGACY
         )
+        binding.characterOrigin.setOnClickListener {
+            val action = CharacterDetailsFragmentDirections
+                .actionCharacterDetailsFragmentToLocationDetailsFragment(
+                    character.origin.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                )
+            findNavController().navigate(action)
+        }
         binding.characterLocation.text = Html.fromHtml(
             resources.getString(R.string.character_location, character.location.name),
             Html.FROM_HTML_MODE_LEGACY
         )
+        binding.characterLocation.setOnClickListener {
+            val action = CharacterDetailsFragmentDirections
+                .actionCharacterDetailsFragmentToLocationDetailsFragment(
+                    character.location.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                )
+            findNavController().navigate(action)
+        }
     }
 
     private fun observeAppearances(){

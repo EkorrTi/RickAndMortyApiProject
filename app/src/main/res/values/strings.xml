@@ -14,6 +14,8 @@
     <string name="character_appearances"><b>Appearances:</b></string>
     <string name="location_dimension">&lt;b>Dimension:&lt;/b> %s</string>
     <string name="location_residents"><b>Residents:</b></string>
+    <string name="episode_air_date">&lt;b>Air Date:&lt;/b> %s</string>
+    <string name="episode_code">&lt;b>Episode:&lt;/b> %s</string>
     <string name="episode_characters"><b>Characters:</b></string>
     <string name="ok">OK</string>
     <string name="error">Error</string>

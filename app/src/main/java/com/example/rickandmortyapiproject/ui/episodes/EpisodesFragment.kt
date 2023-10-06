@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.ui.utils.Utils
@@ -38,7 +39,10 @@ class EpisodesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = EpisodeListAdapter()
-        // adapter.onClick = {}
+        adapter.onClick = {
+            val action = EpisodesFragmentDirections.actionNavigationEpisodesToEpisodeDetailsFragment(it.id)
+            findNavController().navigate(action)
+        }
         binding.recyclerView.adapter = adapter
         observeEpisodes()
 
