@@ -13,8 +13,10 @@
     <string name="character_location">&lt;b>Current Location:&lt;/b> &lt;u>%s&lt;/u></string>
     <string name="character_appearances"><b>Appearances:</b></string>
     <string name="location_residents"><b>Residents:</b></string>
+    <string name="episode_characters"><b>Characters:</b></string>
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="error_text">An unknown error has happened</string>
     <string name="timeout_exception">The server too long to answer, please check your internet connection</string>
+    <string name="none">None</string>
 </resources>

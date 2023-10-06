@@ -15,7 +15,7 @@
             android:id="@+id/location_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/list_item_text"
+            android:textSize="@dimen/list_item_big_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -25,11 +25,12 @@
             android:id="@+id/location_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_s"
             android:textSize="@dimen/list_item_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/location_name"
-            tools:text="Planet" />
+            tools:text="Type: Planet" />
 
         <TextView
             android:id="@+id/location_dimension"
@@ -39,7 +40,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/location_type"
-            tools:text="Normal" />
+            tools:text="Normal Dimension" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

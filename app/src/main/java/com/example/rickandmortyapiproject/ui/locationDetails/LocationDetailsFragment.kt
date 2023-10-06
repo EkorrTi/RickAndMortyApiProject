@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -89,6 +90,11 @@ class LocationDetailsFragment : Fragment() {
                     when (state) {
                         is LocationDetailsViewModel.LocationDetailState.SuccessResidents -> {
                             (binding.recyclerView.adapter as CharactersListAdapter).data = state.result
+                            cancel("Success")
+                        }
+
+                        is LocationDetailsViewModel.LocationDetailState.NoResidents -> {
+                            binding.locationResidentsNone.isVisible = true
                             cancel("Success")
                         }
 

@@ -14,20 +14,23 @@ private const val ID_START_INDEX = 42
 private const val TAG = "LocationDetail"
 
 class LocationDetailsViewModel : ViewModel() {
-    private val _responseLocationState = MutableStateFlow<LocationDetailState>(LocationDetailState.Empty)
+    private val _responseLocationState =
+        MutableStateFlow<LocationDetailState>(LocationDetailState.Empty)
     val responseLocationState = _responseLocationState.asStateFlow()
-    private val _responseResidentsState = MutableStateFlow<LocationDetailState>(LocationDetailState.Empty)
+    private val _responseResidentsState =
+        MutableStateFlow<LocationDetailState>(LocationDetailState.Empty)
     val responseResidentsState = _responseResidentsState.asStateFlow()
 
     sealed class LocationDetailState {
         object Empty : LocationDetailState()
         object Loading : LocationDetailState()
-        data class Success(val result: Location): LocationDetailState()
-        data class SuccessResidents(val result: List<Character>): LocationDetailState()
-        data class Error(val error: Throwable): LocationDetailState()
+        data class Success(val result: Location) : LocationDetailState()
+        data class SuccessResidents(val result: List<Character>) : LocationDetailState()
+        object NoResidents : LocationDetailState()
+        data class Error(val error: Throwable) : LocationDetailState()
     }
 
-    fun getLocation(id: Int){
+    fun getLocation(id: Int) {
         viewModelScope.launch {
             Log.i(TAG, "sending the request")
             _responseLocationState.value = LocationDetailState.Loading
@@ -39,14 +42,18 @@ class LocationDetailsViewModel : ViewModel() {
                 getResidents(
                     (_responseLocationState.value as LocationDetailState.Success).result.residents
                 )
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 Log.w(TAG, e)
                 _responseLocationState.value = LocationDetailState.Error(e)
             }
         }
     }
 
-    private fun getResidents(characters: List<String>){
+    private fun getResidents(characters: List<String>) {
+        if (characters.isEmpty()){
+            Log.i(TAG, "Residents empty")
+            _responseResidentsState.value = LocationDetailState.NoResidents
+        }
         val ids = mutableListOf<Int>()
         for (c in characters) ids.add(c.substring(ID_START_INDEX).toInt())
         Log.i(TAG, "Extracted episode ids: $ids")

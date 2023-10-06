@@ -57,6 +57,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.9.0")
     // Coil
     implementation("io.coil-kt:coil:1.4.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
