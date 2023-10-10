@@ -5,7 +5,7 @@
     android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.characters.CharactersFragment">
+    tools:context=".ui.CharactersFragment">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,6 +25,7 @@
             android:id="@+id/progress_circular"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:visibility="gone"
             android:layout_gravity="center" />
     </FrameLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.episodeDetails
+package com.example.rickandmortyapiproject.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.rickandmortyapiproject.models.Character
 import com.example.rickandmortyapiproject.models.Episode
 import com.example.rickandmortyapiproject.network.RNMApi
-import com.example.rickandmortyapiproject.ui.utils.Utils
+import com.example.rickandmortyapiproject.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

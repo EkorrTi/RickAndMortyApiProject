@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/fragment_horizontal_padding"
     android:paddingTop="@dimen/fragment_top_padding"
-    tools:context=".ui.episodeDetails.EpisodeDetailsFragment">
+    tools:context=".ui.EpisodeDetailsFragment">
 
     <TextView
         android:id="@+id/episode_name"

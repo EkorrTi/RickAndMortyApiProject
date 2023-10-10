@@ -8,4 +8,8 @@ data class Location(
     val type: String,
     val dimension: String,
     val residents: List<String>,
-): Serializable
+): Serializable {
+    override fun toString(): String {
+        return "Location(id=$id, name='$name', type='$type', dimension='$dimension', residents=${residents.size})"
+    }
+}

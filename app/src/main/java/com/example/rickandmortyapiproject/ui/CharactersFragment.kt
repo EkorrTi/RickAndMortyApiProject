@@ -1,20 +1,23 @@
-package com.example.rickandmortyapiproject.ui.characters
+package com.example.rickandmortyapiproject.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.ui.utils.Utils
-import kotlinx.coroutines.cancel
+import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.viewmodels.CharactersViewModel
 import kotlinx.coroutines.launch
 
 class CharactersFragment : Fragment() {
@@ -22,6 +25,13 @@ class CharactersFragment : Fragment() {
     private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CharactersViewModel by viewModels()
+    private val adapter = CharactersListAdapter()
+    private var isLoading: Boolean
+        get() = binding.progressCircular.isVisible
+        set(value) { binding.progressCircular.isVisible = value }
+    private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
+    private var replaceData = false
+    private var isObserving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,18 +48,36 @@ class CharactersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = CharactersListAdapter()
         adapter.onClick = {
             val action = CharactersFragmentDirections
                 .actionNavigationCharactersToCharacterDetailsFragment(it.id)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
-        observeCharacters()
+
+        if (!isObserving) observeCharacters()
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager!! as GridLayoutManager
+
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if (!isLoading && !isLastPage) {
+                    if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+                        isLoading = true
+                        viewModel.getNext()
+                    }
+                }
+            }
+        })
 
         binding.swipeRefresh.setOnRefreshListener {
+            replaceData = true
             viewModel.get()
-            observeCharacters()
             binding.swipeRefresh.isRefreshing = false
         }
 
@@ -57,21 +85,24 @@ class CharactersFragment : Fragment() {
     }
 
     private fun observeCharacters() {
+        Log.i("CharactersList", "Started an observer")
+        isObserving = true
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.responseState.collect { state ->
-                    binding.progressCircular.isGone =
-                        state !is CharactersViewModel.CharactersState.Loading
+                    isLoading = state is CharactersViewModel.CharactersState.Loading
                     when (state) {
                         is CharactersViewModel.CharactersState.Success -> {
-                            (binding.recyclerView.adapter as CharactersListAdapter)
-                                .data = state.result.results
-                            cancel("Successful")
+                            Log.i("CharacterList", "observer success")
+                            if (replaceData) adapter.data = state.result.results.toMutableList()
+                            else adapter.addData(state.result.results)
+
+                            replaceData = false
+                            viewModel.nextUrl = state.result.info.next
                         }
 
                         is CharactersViewModel.CharactersState.Error -> {
                             Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
                         }
 
                         else -> Unit
@@ -79,10 +110,5 @@ class CharactersFragment : Fragment() {
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

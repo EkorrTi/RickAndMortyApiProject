@@ -8,4 +8,8 @@ data class Episode(
     val airDate: String,
     val episode: String,
     val characters: List<String>,
-): Serializable
+): Serializable {
+    override fun toString(): String {
+        return "Episode(id=$id, name='$name', airDate='$airDate', episode='$episode', characters=${characters.size})"
+    }
+}

@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.locations
+package com.example.rickandmortyapiproject.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val TAG = "LocationsList"
+private const val TAG = "LocationsListViewModel"
 
 class LocationsViewModel: ViewModel() {
     private val _responseState = MutableStateFlow<LocationsState>(LocationsState.Empty)
     val responseState = _responseState.asStateFlow()
+    var nextUrl: String? = null
 
     sealed class LocationsState {
         object Empty: LocationsState()
@@ -36,6 +37,21 @@ class LocationsViewModel: ViewModel() {
                     RNMApi.retrofitService.getLocations(page, name, type, dimension)
                 )
                 Log.i(TAG, responseState.value.toString())
+            } catch (e: Exception){
+                Log.w(TAG, e)
+                _responseState.value = LocationsState.Error(e)
+            }
+        }
+    }
+
+    fun getNext(){
+        viewModelScope.launch {
+            Log.i(TAG, "fetching next")
+            _responseState.value = LocationsState.Loading
+            try {
+                _responseState.value = LocationsState.Success(
+                    RNMApi.retrofitService.getLocations(nextUrl!!)
+                )
             } catch (e: Exception){
                 Log.w(TAG, e)
                 _responseState.value = LocationsState.Error(e)

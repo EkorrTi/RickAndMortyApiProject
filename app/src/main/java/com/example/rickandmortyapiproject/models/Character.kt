@@ -13,7 +13,11 @@ data class Character(
     val location: CharacterDetails,
     val image: String,
     val episode: List<String>,
-): Serializable
+): Serializable {
+    override fun toString(): String {
+        return "Character(id=$id, name='$name', status='$status', species='$species', type='$type', gender='$gender', origin=$origin, location=$location, image='$image', episodes=${episode.size})"
+    }
+}
 
 data class CharacterDetails(
     val name: String,

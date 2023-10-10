@@ -1,20 +1,23 @@
-package com.example.rickandmortyapiproject.ui.locations
+package com.example.rickandmortyapiproject.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.adapters.LocationListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.ui.utils.Utils
-import kotlinx.coroutines.cancel
+import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.viewmodels.LocationsViewModel
 import kotlinx.coroutines.launch
 
 class LocationsFragment : Fragment() {
@@ -22,6 +25,15 @@ class LocationsFragment : Fragment() {
     private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LocationsViewModel by viewModels()
+    private val adapter = LocationListAdapter()
+    private var isLoading: Boolean
+        get() = binding.progressCircular.isVisible
+        set(value) {
+            binding.progressCircular.isVisible = value
+        }
+    private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
+    private var replaceData = false
+    private var isObserving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,18 +50,35 @@ class LocationsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = LocationListAdapter()
         adapter.onClick = {
             val action = LocationsFragmentDirections
                 .actionNavigationLocationsToLocationDetailsFragment(it.id)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
-        observeLocations()
+        if (!isObserving) observeLocations()
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager!! as GridLayoutManager
+
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if (!isLoading && !isLastPage) {
+                    if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+                        isLoading = true
+                        viewModel.getNext()
+                    }
+                }
+            }
+        })
 
         binding.swipeRefresh.setOnRefreshListener {
+            replaceData = true
             viewModel.get()
-            observeLocations()
             binding.swipeRefresh.isRefreshing = false
         }
 
@@ -57,21 +86,24 @@ class LocationsFragment : Fragment() {
     }
 
     private fun observeLocations() {
+        Log.i("EpisodesList", "started an observer")
+        isObserving = true
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.responseState.collect { state ->
-                    binding.progressCircular.isGone =
-                        state !is LocationsViewModel.LocationsState.Loading
+                    isLoading = state is LocationsViewModel.LocationsState.Loading
                     when (state) {
                         is LocationsViewModel.LocationsState.Success -> {
-                            (binding.recyclerView.adapter as LocationListAdapter)
-                                .data = state.result.results
-                            cancel("Successful")
+                            Log.i("EpisodesList", "observer success")
+                            if (replaceData) adapter.data = state.result.results.toMutableList()
+                            else adapter.addData(state.result.results)
+
+                            replaceData = false
+                            viewModel.nextUrl = state.result.info.next
                         }
 
                         is LocationsViewModel.LocationsState.Error -> {
                             Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error")
                         }
 
                         else -> Unit
@@ -79,10 +111,5 @@ class LocationsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

@@ -13,7 +13,7 @@ import com.example.rickandmortyapiproject.models.Character
 
 class CharactersListAdapter :
     RecyclerView.Adapter<CharactersListAdapter.CharacterListViewHolder>() {
-    var data: List<Character> = emptyList()
+    var data: MutableList<Character> = mutableListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -56,5 +56,12 @@ class CharactersListAdapter :
         val species: TextView = view.findViewById(R.id.species_text_view)
         val status: TextView = view.findViewById(R.id.status_text_view)
         val gender: TextView = view.findViewById(R.id.gender_text_view)
+    }
+
+    fun addData(list: List<Character>) {
+        val size = data.size
+        data.addAll(list)
+        val newSize = data.size
+        notifyItemRangeChanged(size, newSize)
     }
 }

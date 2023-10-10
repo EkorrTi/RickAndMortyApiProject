@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.utils
+package com.example.rickandmortyapiproject.utils
 
 import android.content.Context
 import androidx.annotation.StringRes

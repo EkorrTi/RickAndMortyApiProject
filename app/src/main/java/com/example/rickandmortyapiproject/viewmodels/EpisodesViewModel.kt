@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.episodes
+package com.example.rickandmortyapiproject.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val TAG = "EpisodesList"
+private const val TAG = "EpisodesListViewModel"
 
 class EpisodesViewModel: ViewModel() {
     private val _responseState = MutableStateFlow<EpisodesState>(EpisodesState.Empty)
     val responseState = _responseState.asStateFlow()
+    var nextUrl: String? = null
 
     sealed class EpisodesState {
         object Empty: EpisodesState()
@@ -36,6 +37,21 @@ class EpisodesViewModel: ViewModel() {
                 )
                 Log.i(TAG, responseState.value.toString())
             } catch (e: Exception){
+                Log.w(TAG, e)
+                _responseState.value = EpisodesState.Error(e)
+            }
+        }
+    }
+
+    fun getNext(){
+        viewModelScope.launch {
+            Log.i(TAG, "fetching next")
+            _responseState.value = EpisodesState.Loading
+            try {
+                _responseState.value = EpisodesState.Success(
+                    RNMApi.retrofitService.getEpisodes(nextUrl!!)
+                )
+            } catch (e: Exception) {
                 Log.w(TAG, e)
                 _responseState.value = EpisodesState.Error(e)
             }

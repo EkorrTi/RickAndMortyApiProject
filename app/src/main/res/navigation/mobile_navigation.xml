@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_characters"
-        android:name="com.example.rickandmortyapiproject.ui.characters.CharactersFragment"
+        android:name="com.example.rickandmortyapiproject.ui.CharactersFragment"
         android:label="@string/title_characters"
         tools:layout="@layout/fragment_recycler_list" >
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/navigation_locations"
-        android:name="com.example.rickandmortyapiproject.ui.locations.LocationsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.LocationsFragment"
         android:label="@string/title_locations"
         tools:layout="@layout/fragment_recycler_list" >
         <action
@@ -27,7 +27,7 @@
 
     <fragment
         android:id="@+id/navigation_episodes"
-        android:name="com.example.rickandmortyapiproject.ui.episodes.EpisodesFragment"
+        android:name="com.example.rickandmortyapiproject.ui.EpisodesFragment"
         android:label="@string/title_episodes"
         tools:layout="@layout/fragment_recycler_list" >
         <action
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/characterDetailsFragment"
-        android:name="com.example.rickandmortyapiproject.ui.characterDetails.CharacterDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.CharacterDetailsFragment"
         android:label="fragment_character_details"
         tools:layout="@layout/fragment_character_details" >
         <argument
@@ -52,7 +52,7 @@
     </fragment>
     <fragment
         android:id="@+id/locationDetailsFragment"
-        android:name="com.example.rickandmortyapiproject.ui.locationDetails.LocationDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.LocationDetailsFragment"
         android:label="fragment_location_details"
         tools:layout="@layout/fragment_location_details" >
         <argument
@@ -64,7 +64,7 @@
     </fragment>
     <fragment
         android:id="@+id/episodeDetailsFragment"
-        android:name="com.example.rickandmortyapiproject.ui.episodeDetails.EpisodeDetailsFragment"
+        android:name="com.example.rickandmortyapiproject.ui.EpisodeDetailsFragment"
         android:label="fragment_episode_details"
         tools:layout="@layout/fragment_episode_details" >
         <argument

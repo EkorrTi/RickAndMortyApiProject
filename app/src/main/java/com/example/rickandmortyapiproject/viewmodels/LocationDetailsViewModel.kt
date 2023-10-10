@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.locationDetails
+package com.example.rickandmortyapiproject.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.rickandmortyapiproject.models.Character
 import com.example.rickandmortyapiproject.models.Location
 import com.example.rickandmortyapiproject.network.RNMApi
-import com.example.rickandmortyapiproject.ui.utils.Utils
+import com.example.rickandmortyapiproject.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -57,7 +57,7 @@ class LocationDetailsViewModel : ViewModel() {
         }
         val ids = mutableListOf<Int>()
         for (c in characters) ids.add(c.substring(Utils.ID_START_INDEX_CHARACTER).toInt())
-        Log.i(TAG, "Extracted episode ids: $ids")
+        Log.i(TAG, "Extracted episode ids: $ids, size: ${ids.size}")
 
         viewModelScope.launch {
             _responseResidentsState.value = LocationDetailState.Loading
@@ -65,6 +65,7 @@ class LocationDetailsViewModel : ViewModel() {
                 _responseResidentsState.value = LocationDetailState.SuccessResidents(
                     RNMApi.retrofitService.getCharactersList(ids)
                 )
+                Log.i(TAG, "got residents")
             } catch (e: Exception) {
                 Log.w(TAG, e)
                 _responseResidentsState.value = LocationDetailState.Error(e)

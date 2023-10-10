@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.characterDetails
+package com.example.rickandmortyapiproject.ui
 
 import android.os.Bundle
 import android.text.Html
@@ -17,7 +17,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentCharacterDetailsBinding
 import com.example.rickandmortyapiproject.models.Character
-import com.example.rickandmortyapiproject.ui.utils.Utils
+import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.viewmodels.CharacterDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -102,23 +103,27 @@ class CharacterDetailsFragment : Fragment() {
             resources.getString(R.string.character_origin, character.origin.name),
             Html.FROM_HTML_MODE_LEGACY
         )
-        binding.characterOrigin.setOnClickListener {
-            val action = CharacterDetailsFragmentDirections
-                .actionCharacterDetailsFragmentToLocationDetailsFragment(
-                    character.origin.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
-                )
-            findNavController().navigate(action)
+        if (character.origin.name != "unknown") {
+            binding.characterOrigin.setOnClickListener {
+                val action = CharacterDetailsFragmentDirections
+                    .actionCharacterDetailsFragmentToLocationDetailsFragment(
+                        character.origin.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                    )
+                findNavController().navigate(action)
+            }
         }
         binding.characterLocation.text = Html.fromHtml(
             resources.getString(R.string.character_location, character.location.name),
             Html.FROM_HTML_MODE_LEGACY
         )
-        binding.characterLocation.setOnClickListener {
-            val action = CharacterDetailsFragmentDirections
-                .actionCharacterDetailsFragmentToLocationDetailsFragment(
-                    character.location.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
-                )
-            findNavController().navigate(action)
+        if (character.location.name != "unknown"){
+            binding.characterLocation.setOnClickListener {
+                val action = CharacterDetailsFragmentDirections
+                    .actionCharacterDetailsFragmentToLocationDetailsFragment(
+                        character.location.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                    )
+                findNavController().navigate(action)
+            }
         }
     }
 
@@ -129,8 +134,7 @@ class CharacterDetailsFragment : Fragment() {
                     binding.progressCircularSub.isGone = state !is CharacterDetailsViewModel.CharacterDetailState.Loading
                     when (state) {
                         is CharacterDetailsViewModel.CharacterDetailState.SuccessAppearances -> {
-                            (binding.recyclerView.adapter as EpisodeListAdapter)
-                                .data = state.result
+                            (binding.recyclerView.adapter as EpisodeListAdapter).data = state.result.toMutableList()
                             cancel("Success")
                         }
                         is CharacterDetailsViewModel.CharacterDetailState.Error -> {

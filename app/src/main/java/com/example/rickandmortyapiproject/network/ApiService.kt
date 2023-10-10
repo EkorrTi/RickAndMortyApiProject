@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 private const val BASE_URL = "https://rickandmortyapi.com/api/"
 
@@ -33,6 +34,9 @@ interface ApiService {
         @Query("gender") gender: String?,
     ): CharactersApiResponse
 
+    @GET
+    suspend fun getCharacters(@Url url: String): CharactersApiResponse
+
     @GET("character/{id}")
     suspend fun getCharacter(@Path("id") id: Int): Character
 
@@ -47,11 +51,11 @@ interface ApiService {
         @Query("dimension") dimension: String?,
     ): LocationsApiResponse
 
+    @GET
+    suspend fun getLocations(@Url url: String): LocationsApiResponse
+
     @GET("location/{id}")
     suspend fun getLocation(@Path("id") id: Int): Location
-
-    @GET("location/{ids}")
-    suspend fun getLocationsList(@Path("ids") ids: List<Int>): List<Location>
 
     @GET("episode")
     suspend fun getEpisodes(
@@ -59,6 +63,9 @@ interface ApiService {
         @Query("name") name: String?,
         @Query("episode") episode: String?,
     ): EpisodesApiResponse
+
+    @GET
+    suspend fun getEpisodes(@Url url: String): EpisodesApiResponse
 
     @GET("episode/{id}")
     suspend fun getEpisode(@Path("id") id: Int): Episode

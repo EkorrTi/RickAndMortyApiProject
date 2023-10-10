@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/fragment_horizontal_padding"
     android:paddingTop="@dimen/fragment_top_padding"
-    tools:context=".ui.locationDetails.LocationDetailsFragment">
+    tools:context=".ui.LocationDetailsFragment">
 
     <TextView
         android:id="@+id/location_name"

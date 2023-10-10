@@ -9,7 +9,7 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.models.Episode
 
 class EpisodeListAdapter: RecyclerView.Adapter<EpisodeListAdapter.EpisodeListViewHolder>() {
-    var data: List<Episode> = emptyList()
+    var data: MutableList<Episode> = mutableListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -39,5 +39,12 @@ class EpisodeListAdapter: RecyclerView.Adapter<EpisodeListAdapter.EpisodeListVie
         val name: TextView = view.findViewById(R.id.episode_name)
         val number: TextView = view.findViewById(R.id.episode_number)
         val date: TextView = view.findViewById(R.id.episode_date)
+    }
+
+    fun addData(list: List<Episode>) {
+        val size = data.size
+        data.addAll(list)
+        val newSize = data.size
+        notifyItemRangeChanged(size, newSize)
     }
 }

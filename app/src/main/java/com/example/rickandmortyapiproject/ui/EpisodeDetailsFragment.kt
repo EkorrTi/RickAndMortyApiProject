@@ -1,7 +1,8 @@
-package com.example.rickandmortyapiproject.ui.episodeDetails
+package com.example.rickandmortyapiproject.ui
 
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentEpisodeDetailsBinding
 import com.example.rickandmortyapiproject.models.Episode
-import com.example.rickandmortyapiproject.ui.utils.Utils
+import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.viewmodels.EpisodeDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -97,7 +99,8 @@ class EpisodeDetailsFragment : Fragment() {
                         state !is EpisodeDetailsViewModel.EpisodeDetailState.Loading
                     when (state) {
                         is EpisodeDetailsViewModel.EpisodeDetailState.SuccessCharacters -> {
-                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result
+                            Log.i("EpisodeDetails", "observer success")
+                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result.toMutableList()
                             cancel("Successful")
                         }
 

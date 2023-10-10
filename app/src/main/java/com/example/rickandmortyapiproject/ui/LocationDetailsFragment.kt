@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.ui.locationDetails
+package com.example.rickandmortyapiproject.ui
 
 import android.os.Bundle
 import android.text.Html
@@ -17,7 +17,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentLocationDetailsBinding
 import com.example.rickandmortyapiproject.models.Location
-import com.example.rickandmortyapiproject.ui.utils.Utils
+import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.viewmodels.LocationDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -97,7 +98,7 @@ class LocationDetailsFragment : Fragment() {
                     binding.progressCircularSub.isGone = state !is LocationDetailsViewModel.LocationDetailState.Loading
                     when (state) {
                         is LocationDetailsViewModel.LocationDetailState.SuccessResidents -> {
-                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result
+                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result.toMutableList()
                             cancel("Success")
                         }
 

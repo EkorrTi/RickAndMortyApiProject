@@ -10,7 +10,7 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.models.Location
 
 class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationListViewHolder>() {
-    var data: List<Location> = emptyList()
+    var data: MutableList<Location> = mutableListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -46,5 +46,12 @@ class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationList
         val name: TextView = view.findViewById(R.id.location_name)
         val type: TextView = view.findViewById(R.id.location_type)
         val dimension: TextView = view.findViewById(R.id.location_dimension)
+    }
+
+    fun addData(list: List<Location>) {
+        val size = data.size
+        data.addAll(list)
+        val newSize = data.size
+        notifyItemRangeChanged(size, newSize)
     }
 }
