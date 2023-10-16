@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.util.DataState
+import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.CharactersViewModel
 import kotlinx.coroutines.launch
 
@@ -90,20 +91,18 @@ class CharactersFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.responseState.collect { state ->
-                    isLoading = state is CharactersViewModel.CharactersState.Loading
+                    isLoading = state is DataState.Loading
                     when (state) {
-                        is CharactersViewModel.CharactersState.Success -> {
+                        is DataState.Success -> {
                             Log.i("CharacterList", "observer success")
-                            if (replaceData) adapter.data = state.result.results.toMutableList()
-                            else adapter.addData(state.result.results)
+                            if (replaceData) adapter.data = state.data.results.toMutableList()
+                            else adapter.addData(state.data.results)
 
                             replaceData = false
-                            viewModel.nextUrl = state.result.info.next
+                            viewModel.nextUrl = state.data.info.next
                         }
 
-                        is CharactersViewModel.CharactersState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                        }
+                        is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)
 
                         else -> Unit
                     }

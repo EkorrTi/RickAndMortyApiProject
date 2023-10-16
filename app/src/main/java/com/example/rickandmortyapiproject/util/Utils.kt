@@ -1,4 +1,4 @@
-package com.example.rickandmortyapiproject.utils
+package com.example.rickandmortyapiproject.util
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -6,9 +6,25 @@ import androidx.appcompat.app.AlertDialog
 import com.example.rickandmortyapiproject.R
 
 object Utils {
-    const val ID_START_INDEX_CHARACTER = 42
-    const val ID_START_INDEX_LOCATION = 41
-    const val ID_START_INDEX_EPISODE = 40
+    private const val ID_START_INDEX_CHARACTER = 42
+    private const val ID_START_INDEX_LOCATION = 41
+    private const val ID_START_INDEX_EPISODE = 40
+
+    fun extractEpisodeIds(episodes: List<String>): MutableList<Int> {
+        val list = mutableListOf<Int>()
+        for (e in episodes)
+            list.add(e.substring(ID_START_INDEX_EPISODE).toInt())
+        return list
+    }
+
+    fun extractCharacterIds(characters: List<String>): MutableList<Int> {
+        val list = mutableListOf<Int>()
+        for (c in characters)
+            list.add(c.substring(ID_START_INDEX_CHARACTER).toInt())
+        return list
+    }
+
+    fun extractCharacterLocationId(url: String): Int = url.substring(ID_START_INDEX_LOCATION).toInt()
 
     fun onErrorResponse(context: Context, e: Throwable) {
         if (e.message == "timeout")

@@ -5,7 +5,6 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,7 +16,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentLocationDetailsBinding
 import com.example.rickandmortyapiproject.models.Location
-import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.util.DataState
+import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.LocationDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -60,16 +60,16 @@ class LocationDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.responseLocationState.collect{ state ->
-                    binding.progressCircularMain.isGone = state !is LocationDetailsViewModel.LocationDetailState.Loading
+                    binding.progressCircularMain.isVisible = state is DataState.Loading
                     when (state) {
-                        is LocationDetailsViewModel.LocationDetailState.Success -> {
-                            showLocation(state.result)
+                        is DataState.Success -> {
+                            showLocation(state.data)
                             cancel("Successful")
                         }
 
-                        is LocationDetailsViewModel.LocationDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
 
                         else -> Unit
@@ -95,21 +95,20 @@ class LocationDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.responseResidentsState.collect{ state ->
-                    binding.progressCircularSub.isGone = state !is LocationDetailsViewModel.LocationDetailState.Loading
+                    binding.progressCircularSub.isVisible = state is DataState.Loading
                     when (state) {
-                        is LocationDetailsViewModel.LocationDetailState.SuccessResidents -> {
-                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result.toMutableList()
+                        is DataState.Success -> {
+                            if (state.data.isEmpty()){
+                                binding.locationResidentsNone.isVisible = true
+                                return@collect
+                            }
+                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.data.toMutableList()
                             cancel("Success")
                         }
 
-                        is LocationDetailsViewModel.LocationDetailState.NoResidents -> {
-                            binding.locationResidentsNone.isVisible = true
-                            cancel("Success")
-                        }
-
-                        is LocationDetailsViewModel.LocationDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
 
                         else -> Unit

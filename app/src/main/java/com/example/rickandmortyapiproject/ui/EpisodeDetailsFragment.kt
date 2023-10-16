@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -17,7 +17,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentEpisodeDetailsBinding
 import com.example.rickandmortyapiproject.models.Episode
-import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.util.DataState
+import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.EpisodeDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -59,17 +60,16 @@ class EpisodeDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseEpisodeState.collect { state ->
-                    binding.progressCircularMain.isGone =
-                        state !is EpisodeDetailsViewModel.EpisodeDetailState.Loading
+                    binding.progressCircularMain.isVisible = state is DataState.Loading
                     when (state) {
-                        is EpisodeDetailsViewModel.EpisodeDetailState.Success -> {
-                            showEpisode(state.result)
+                        is DataState.Success -> {
+                            showEpisode(state.data)
                             cancel("Successful")
                         }
 
-                        is EpisodeDetailsViewModel.EpisodeDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
 
                         else -> Unit
@@ -95,18 +95,17 @@ class EpisodeDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseCharactersState.collect { state ->
-                    binding.progressCircularSub.isGone =
-                        state !is EpisodeDetailsViewModel.EpisodeDetailState.Loading
+                    binding.progressCircularSub.isVisible = state is DataState.Loading
                     when (state) {
-                        is EpisodeDetailsViewModel.EpisodeDetailState.SuccessCharacters -> {
+                        is DataState.Success -> {
                             Log.i("EpisodeDetails", "observer success")
-                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.result.toMutableList()
+                            (binding.recyclerView.adapter as CharactersListAdapter).data = state.data.toMutableList()
                             cancel("Successful")
                         }
 
-                        is EpisodeDetailsViewModel.EpisodeDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
 
                         else -> Unit

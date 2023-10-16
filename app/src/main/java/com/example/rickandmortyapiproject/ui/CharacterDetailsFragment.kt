@@ -5,7 +5,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -17,7 +17,8 @@ import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentCharacterDetailsBinding
 import com.example.rickandmortyapiproject.models.Character
-import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.util.DataState
+import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.CharacterDetailsViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -59,16 +60,16 @@ class CharacterDetailsFragment : Fragment() {
         lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.responseCharacterState.collect{ state ->
-                    binding.progressCircularMain.isGone = state !is CharacterDetailsViewModel.CharacterDetailState.Loading
+                    binding.progressCircularMain.isVisible = state is DataState.Loading
                     when (state) {
-                        is CharacterDetailsViewModel.CharacterDetailState.Success -> {
-                            showCharacter(state.result)
+                        is DataState.Success -> {
+                            showCharacter(state.data)
                             cancel("Successful")
                         }
 
-                        is CharacterDetailsViewModel.CharacterDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
 
                         else -> Unit
@@ -107,7 +108,7 @@ class CharacterDetailsFragment : Fragment() {
             binding.characterOrigin.setOnClickListener {
                 val action = CharacterDetailsFragmentDirections
                     .actionCharacterDetailsFragmentToLocationDetailsFragment(
-                        character.origin.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                        Utils.extractCharacterLocationId(character.origin.url)
                     )
                 findNavController().navigate(action)
             }
@@ -120,7 +121,7 @@ class CharacterDetailsFragment : Fragment() {
             binding.characterLocation.setOnClickListener {
                 val action = CharacterDetailsFragmentDirections
                     .actionCharacterDetailsFragmentToLocationDetailsFragment(
-                        character.location.url.substring(Utils.ID_START_INDEX_LOCATION).toInt()
+                        Utils.extractCharacterLocationId(character.location.url)
                     )
                 findNavController().navigate(action)
             }
@@ -131,15 +132,15 @@ class CharacterDetailsFragment : Fragment() {
         lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.responseEpisodesState.collect{ state ->
-                    binding.progressCircularSub.isGone = state !is CharacterDetailsViewModel.CharacterDetailState.Loading
+                    binding.progressCircularSub.isVisible = state is DataState.Loading
                     when (state) {
-                        is CharacterDetailsViewModel.CharacterDetailState.SuccessAppearances -> {
-                            (binding.recyclerView.adapter as EpisodeListAdapter).data = state.result.toMutableList()
+                        is DataState.Success -> {
+                            (binding.recyclerView.adapter as EpisodeListAdapter).data = state.data.toMutableList()
                             cancel("Success")
                         }
-                        is CharacterDetailsViewModel.CharacterDetailState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                            cancel("Error", state.error)
+                        is DataState.Error -> {
+                            Utils.onErrorResponse(requireContext(), state.exception)
+                            cancel("Error", state.exception)
                         }
                         else -> Unit
                     }

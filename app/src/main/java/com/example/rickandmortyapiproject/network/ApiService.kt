@@ -26,7 +26,6 @@ private val retrofit = Retrofit.Builder()
 interface ApiService {
     @GET("character")
     suspend fun getCharacters(
-        @Query("page") page: Int?,
         @Query("name") name: String?,
         @Query("status") status: String?,
         @Query("species") species: String?,
@@ -45,7 +44,6 @@ interface ApiService {
 
     @GET("location")
     suspend fun getLocations(
-        @Query("page") page: Int? = null,
         @Query("name") name: String?,
         @Query("type") type: String?,
         @Query("dimension") dimension: String?,
@@ -59,7 +57,6 @@ interface ApiService {
 
     @GET("episode")
     suspend fun getEpisodes(
-        @Query("page") page: Int? = null,
         @Query("name") name: String?,
         @Query("episode") episode: String?,
     ): EpisodesApiResponse
@@ -74,7 +71,7 @@ interface ApiService {
     suspend fun getEpisodesList(@Path("ids") ids: List<Int>): List<Episode>
 }
 
-object RNMApi {
+object NetworkService {
     val retrofitService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }

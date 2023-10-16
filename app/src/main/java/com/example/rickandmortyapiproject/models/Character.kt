@@ -1,8 +1,12 @@
 package com.example.rickandmortyapiproject.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.Serializable
 
+@Entity(tableName = "character")
 data class Character(
+    @PrimaryKey(autoGenerate = false)
     val id: Int,
     val name: String,
     val status: String,

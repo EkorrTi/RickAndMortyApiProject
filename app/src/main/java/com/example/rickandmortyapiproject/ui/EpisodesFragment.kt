@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
-import com.example.rickandmortyapiproject.utils.Utils
+import com.example.rickandmortyapiproject.util.DataState
+import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.EpisodesViewModel
 import kotlinx.coroutines.launch
 
@@ -91,20 +92,18 @@ class EpisodesFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.responseState.collect { state ->
-                    isLoading = state is EpisodesViewModel.EpisodesState.Loading
+                    isLoading = state is DataState.Loading
                     when (state) {
-                        is EpisodesViewModel.EpisodesState.Success -> {
+                        is DataState.Success -> {
                             Log.i("EpisodesList", "observer success")
-                            if (replaceData) adapter.data = state.result.results.toMutableList()
-                            else adapter.addData(state.result.results)
+                            if (replaceData) adapter.data = state.data.results.toMutableList()
+                            else adapter.addData(state.data.results)
 
                             replaceData = false
-                            viewModel.nextUrl = state.result.info.next
+                            viewModel.nextUrl = state.data.info.next
                         }
 
-                        is EpisodesViewModel.EpisodesState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.error)
-                        }
+                        is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)
 
                         else -> Unit
                     }
