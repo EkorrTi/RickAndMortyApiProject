@@ -35,6 +35,7 @@ class EpisodesFragment : Fragment() {
     private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
     private var replaceData = false
     private var isObserving = false
+    private val isConnected get() = Utils.isConnectedToNetwork(requireContext())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +69,7 @@ class EpisodesFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if (!isLoading && !isLastPage) {
+                if (!isLoading && !isLastPage && isConnected) {
                     if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
                         isLoading = true
                         viewModel.getNext()
@@ -96,11 +97,10 @@ class EpisodesFragment : Fragment() {
                     when (state) {
                         is DataState.Success -> {
                             Log.i("EpisodesList", "observer success")
-                            if (replaceData) adapter.data = state.data.results.toMutableList()
-                            else adapter.addData(state.data.results)
+                            if (replaceData) adapter.data = state.data.toMutableList()
+                            else adapter.addData(state.data)
 
                             replaceData = false
-                            viewModel.nextUrl = state.data.info.next
                         }
 
                         is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)

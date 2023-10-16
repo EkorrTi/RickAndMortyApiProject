@@ -7,25 +7,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.rickandmortyapiproject.R
+import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.CharactersListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.CharactersViewModel
+import com.example.rickandmortyapiproject.viewmodels.CharactersViewModelFactory
 import kotlinx.coroutines.launch
 
 class CharactersFragment : Fragment() {
 
     private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CharactersViewModel by viewModels()
+    private val viewModel: CharactersViewModel by activityViewModels {
+        CharactersViewModelFactory(
+            (activity?.application as RickAndMortyApplication).database.characterDao
+        )
+    }
     private val adapter = CharactersListAdapter()
     private var isLoading: Boolean
         get() = binding.progressCircular.isVisible
@@ -33,10 +40,13 @@ class CharactersFragment : Fragment() {
     private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
     private var replaceData = false
     private var isObserving = false
+    private val isConnected get() = Utils.isConnectedToNetwork(requireContext())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.get()
+        if (isConnected) viewModel.get()
+        else viewModel.getFromDB()
     }
 
     override fun onCreateView(
@@ -67,7 +77,7 @@ class CharactersFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if (!isLoading && !isLastPage) {
+                if (!isLoading && !isLastPage && isConnected) {
                     if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
                         isLoading = true
                         viewModel.getNext()
@@ -95,14 +105,19 @@ class CharactersFragment : Fragment() {
                     when (state) {
                         is DataState.Success -> {
                             Log.i("CharacterList", "observer success")
-                            if (replaceData) adapter.data = state.data.results.toMutableList()
-                            else adapter.addData(state.data.results)
+                            if (replaceData) adapter.data = state.data.toMutableList()
+                            else adapter.addData(state.data)
 
                             replaceData = false
-                            viewModel.nextUrl = state.data.info.next
                         }
 
-                        is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)
+                        is DataState.Error -> {
+                            Log.i("CharacterList", state.exception.toString())
+                            if (!isConnected)
+                                Utils.showAlertDialog(requireContext(), R.string.no_internet_exception)
+                            else
+                                Utils.onErrorResponse(requireContext(), state.exception)
+                        }
 
                         else -> Unit
                     }

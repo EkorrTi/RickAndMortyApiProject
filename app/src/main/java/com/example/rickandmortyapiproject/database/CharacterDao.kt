@@ -9,7 +9,7 @@ import com.example.rickandmortyapiproject.models.Character
 @Dao
 interface CharacterDao {
     @Query("SELECT * FROM character WHERE id = :id")
-    fun getById(id: Int): Character
+    suspend fun getById(id: Int): Character
 
     @Query(
         """SELECT * FROM character
@@ -19,7 +19,7 @@ interface CharacterDao {
         AND (:type IS NULL OR type LIKE :type)
         AND (:gender IS NULL OR gender LIKE :gender)
     """)
-    fun getAll(
+    suspend fun getAll(
         name: String? = null,
         status: String? = null,
         species: String? = null,
@@ -28,8 +28,8 @@ interface CharacterDao {
     ): List<Character>
 
     @Query("SELECT * FROM character WHERE id IN (:ids)")
-    fun getAllById(ids: List<Int>): List<Character>
+    suspend fun getAllById(ids: List<Int>): List<Character>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(char: Character)
+    suspend fun insert(characters: List<Character>)
 }

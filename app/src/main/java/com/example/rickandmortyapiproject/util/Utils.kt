@@ -1,6 +1,7 @@
 package com.example.rickandmortyapiproject.util
 
 import android.content.Context
+import android.net.ConnectivityManager
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.example.rickandmortyapiproject.R
@@ -25,6 +26,12 @@ object Utils {
     }
 
     fun extractCharacterLocationId(url: String): Int = url.substring(ID_START_INDEX_LOCATION).toInt()
+
+    fun isConnectedToNetwork(context: Context) : Boolean {
+        val conMan = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = conMan.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
 
     fun onErrorResponse(context: Context, e: Throwable) {
         if (e.message == "timeout")

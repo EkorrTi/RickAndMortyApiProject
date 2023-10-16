@@ -21,5 +21,6 @@
     <string name="error">Error</string>
     <string name="error_text">An unknown error has happened</string>
     <string name="timeout_exception">The server too long to answer, please check your internet connection</string>
+    <string name="no_internet_exception">No internet connection</string>
     <string name="none">None</string>
 </resources>
