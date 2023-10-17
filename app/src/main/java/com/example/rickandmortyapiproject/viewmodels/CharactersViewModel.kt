@@ -35,11 +35,7 @@ class CharactersViewModel(private val characterDao: CharacterDao) : ViewModel() 
         }
     }
 
-    private fun insertIntoDB(characters: List<Character>){
-        viewModelScope.launch {
-            characterDao.insert(characters)
-        }
-    }
+    private suspend fun insertIntoDB(characters: List<Character>) = characterDao.insert(characters)
 
     fun get(
         name: String? = null,

@@ -7,25 +7,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.rickandmortyapiproject.R
+import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.LocationListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.LocationsViewModel
+import com.example.rickandmortyapiproject.viewmodels.LocationsViewModelFactory
 import kotlinx.coroutines.launch
 
 class LocationsFragment : Fragment() {
 
     private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LocationsViewModel by viewModels()
+    private val viewModel: LocationsViewModel by activityViewModels {
+        LocationsViewModelFactory(
+            (requireActivity().application as RickAndMortyApplication).database.locationDao
+        )
+    }
     private val adapter = LocationListAdapter()
     private var isLoading: Boolean
         get() = binding.progressCircular.isVisible
@@ -39,7 +46,8 @@ class LocationsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.get()
+        if (isConnected) viewModel.get()
+        else viewModel.getFromDB()
     }
 
     override fun onCreateView(
@@ -97,13 +105,23 @@ class LocationsFragment : Fragment() {
                     when (state) {
                         is DataState.Success -> {
                             Log.i("EpisodesList", "observer success")
+                            if (state.data.isEmpty()){
+                                Utils.showAlertDialog(requireContext(), R.string.no_cached_data)
+                                return@collect
+                            }
+
                             if (replaceData) adapter.data = state.data.toMutableList()
                             else adapter.addData(state.data)
 
                             replaceData = false
                         }
 
-                        is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)
+                        is DataState.Error -> {
+                            if (!isConnected)
+                                Utils.showAlertDialog(requireContext(), R.string.no_internet_exception)
+                            else
+                                Utils.onErrorResponse(requireContext(), state.exception)
+                        }
 
                         else -> Unit
                     }

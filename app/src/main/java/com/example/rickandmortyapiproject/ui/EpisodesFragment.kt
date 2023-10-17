@@ -7,25 +7,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.rickandmortyapiproject.R
+import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.EpisodesViewModel
+import com.example.rickandmortyapiproject.viewmodels.EpisodesViewModelFactory
 import kotlinx.coroutines.launch
 
 class EpisodesFragment : Fragment() {
 
     private var _binding: FragmentRecyclerListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: EpisodesViewModel by viewModels()
+    private val viewModel: EpisodesViewModel by activityViewModels {
+        EpisodesViewModelFactory(
+            (requireActivity().application as RickAndMortyApplication).database.episodeDao
+        )
+    }
     private val adapter = EpisodeListAdapter()
     private var isLoading: Boolean
         get() = binding.progressCircular.isVisible
@@ -39,7 +46,8 @@ class EpisodesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.get()
+        if (isConnected) viewModel.get()
+        else viewModel.getFromDB()
     }
 
     override fun onCreateView(
@@ -53,7 +61,8 @@ class EpisodesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter.onClick = {
-            val action = EpisodesFragmentDirections.actionNavigationEpisodesToEpisodeDetailsFragment(it.id)
+            val action = EpisodesFragmentDirections
+                .actionNavigationEpisodesToEpisodeDetailsFragment(it.id)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
@@ -97,13 +106,24 @@ class EpisodesFragment : Fragment() {
                     when (state) {
                         is DataState.Success -> {
                             Log.i("EpisodesList", "observer success")
+                            if (state.data.isEmpty()) {
+                                Utils.showAlertDialog(requireContext(), R.string.no_cached_data)
+                                return@collect
+                            }
+
                             if (replaceData) adapter.data = state.data.toMutableList()
                             else adapter.addData(state.data)
 
                             replaceData = false
                         }
 
-                        is DataState.Error -> Utils.onErrorResponse(requireContext(), state.exception)
+                        is DataState.Error -> {
+                            Log.w("EpisodeList", state.exception)
+                            if (!isConnected)
+                                Utils.showAlertDialog(requireContext(), R.string.no_internet_exception)
+                            else
+                                Utils.onErrorResponse(requireContext(), state.exception)
+                        }
 
                         else -> Unit
                     }

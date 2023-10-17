@@ -30,7 +30,7 @@ class CharactersFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: CharactersViewModel by activityViewModels {
         CharactersViewModelFactory(
-            (activity?.application as RickAndMortyApplication).database.characterDao
+            (requireActivity().application as RickAndMortyApplication).database.characterDao
         )
     }
     private val adapter = CharactersListAdapter()
@@ -105,6 +105,11 @@ class CharactersFragment : Fragment() {
                     when (state) {
                         is DataState.Success -> {
                             Log.i("CharacterList", "observer success")
+                            if (state.data.isEmpty()){
+                                Utils.showAlertDialog(requireContext(), R.string.no_cached_data)
+                                return@collect
+                            }
+
                             if (replaceData) adapter.data = state.data.toMutableList()
                             else adapter.addData(state.data)
 
@@ -112,7 +117,7 @@ class CharactersFragment : Fragment() {
                         }
 
                         is DataState.Error -> {
-                            Log.i("CharacterList", state.exception.toString())
+                            Log.w("CharacterList", state.exception.toString())
                             if (!isConnected)
                                 Utils.showAlertDialog(requireContext(), R.string.no_internet_exception)
                             else

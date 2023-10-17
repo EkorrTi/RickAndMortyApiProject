@@ -9,7 +9,7 @@ import com.example.rickandmortyapiproject.models.Location
 @Dao
 interface LocationDao {
     @Query("SELECT * FROM location WHERE id = :id")
-    fun getById(id: Int): Location
+    suspend fun getById(id: Int): Location
 
     @Query(
         """SELECT * FROM location
@@ -17,12 +17,12 @@ interface LocationDao {
         AND (:type IS NULL OR type LIKE :type)
         AND (:dimension IS NULL OR dimension LIKE :dimension)"""
     )
-    fun getAll(
+    suspend fun getAll(
         name: String? = null,
         type: String? = null,
         dimension: String? = null
     ): List<Location>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(loc: Location)
+    suspend fun insert(locations: List<Location>)
 }

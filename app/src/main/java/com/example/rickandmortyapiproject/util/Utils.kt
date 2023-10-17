@@ -2,6 +2,7 @@ package com.example.rickandmortyapiproject.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.example.rickandmortyapiproject.R
@@ -38,6 +39,8 @@ object Utils {
             showAlertDialog(context, R.string.timeout_exception)
         else
             showAlertDialog(context)
+
+        Log.w("Response error", e.toString())
     }
 
     /**
