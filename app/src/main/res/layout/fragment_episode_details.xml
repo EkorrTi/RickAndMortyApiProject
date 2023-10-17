@@ -44,8 +44,10 @@
         android:layout_marginTop="@dimen/margin_s"
         android:text="@string/episode_characters"
         android:textSize="@dimen/details_text"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/episode_date"
-        app:layout_constraintTop_toBottomOf="@id/episode_code" />
+        app:layout_constraintTop_toBottomOf="@id/episode_code"
+        tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -58,18 +60,6 @@
         app:spanCount="2"
         tools:itemCount="4"
         tools:listitem="@layout/character_list_item" />
-
-    <TextView
-        android:id="@+id/episode_characters_none"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_s"
-        android:text="@string/none"
-        android:textSize="@dimen/details_text"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/episode_characters"
-        app:layout_constraintStart_toEndOf="@+id/episode_characters"
-        app:layout_constraintTop_toTopOf="@+id/episode_characters" />
 
     <ProgressBar
         android:id="@+id/progress_circular_main"

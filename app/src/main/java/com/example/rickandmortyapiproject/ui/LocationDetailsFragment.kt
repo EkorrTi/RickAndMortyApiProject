@@ -5,6 +5,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -80,6 +81,8 @@ class LocationDetailsFragment : Fragment() {
     }
 
     private fun showLocation(loc: Location){
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = loc.name
+
         binding.locationName.text = loc.name
         binding.locationType.text = Html.fromHtml(
             getString(R.string.type, loc.type),
@@ -89,6 +92,8 @@ class LocationDetailsFragment : Fragment() {
             getString(R.string.location_dimension, loc.dimension),
             Html.FROM_HTML_MODE_LEGACY
         )
+
+        binding.locationResidents.isVisible = true
     }
 
     private fun observeResidents(){

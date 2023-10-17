@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -80,6 +81,8 @@ class EpisodeDetailsFragment : Fragment() {
     }
 
     private fun showEpisode(ep: Episode) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = ep.name
+
         binding.episodeName.text = ep.name
         binding.episodeDate.text = Html.fromHtml(
             getString(R.string.episode_air_date, ep.airDate),
@@ -89,6 +92,8 @@ class EpisodeDetailsFragment : Fragment() {
             getString(R.string.episode_code, ep.episode),
             Html.FROM_HTML_MODE_LEGACY
         )
+
+        binding.episodeCharacters.isVisible = true
     }
 
     private fun observeCharacters() {

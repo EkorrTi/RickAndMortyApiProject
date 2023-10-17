@@ -5,6 +5,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -80,6 +81,8 @@ class CharacterDetailsFragment : Fragment() {
     }
 
     private fun showCharacter(character: Character){
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = character.name
+
         binding.characterName.text = character.name
         binding.characterImage.load(character.image)
         binding.characterStatus.text = Html.fromHtml(
@@ -126,6 +129,8 @@ class CharacterDetailsFragment : Fragment() {
                 findNavController().navigate(action)
             }
         }
+
+        binding.characterAppearances.isVisible = true
     }
 
     private fun observeAppearances(){
