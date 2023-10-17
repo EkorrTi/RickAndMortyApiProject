@@ -40,7 +40,7 @@ interface ApiService {
     suspend fun getCharacter(@Path("id") id: Int): Character
 
     @GET("character/{ids}")
-    suspend fun getCharactersList(@Path("ids") ids: List<Int>): List<Character>
+    suspend fun getCharactersByIds(@Path("ids") ids: List<Int>): List<Character>
 
     @GET("location")
     suspend fun getLocations(
@@ -68,7 +68,7 @@ interface ApiService {
     suspend fun getEpisode(@Path("id") id: Int): Episode
 
     @GET("episode/{ids}")
-    suspend fun getEpisodesList(@Path("ids") ids: List<Int>): List<Episode>
+    suspend fun getEpisodesByIds(@Path("ids") ids: List<Int>): List<Episode>
 }
 
 object NetworkService {

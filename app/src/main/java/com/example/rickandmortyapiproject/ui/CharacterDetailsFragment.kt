@@ -8,32 +8,39 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.rickandmortyapiproject.R
+import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
 import com.example.rickandmortyapiproject.databinding.FragmentCharacterDetailsBinding
 import com.example.rickandmortyapiproject.models.Character
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.CharacterDetailsViewModel
-import kotlinx.coroutines.cancel
+import com.example.rickandmortyapiproject.viewmodels.CharacterDetailsViewModelFactory
 import kotlinx.coroutines.launch
 
 class CharacterDetailsFragment : Fragment() {
     private var id: Int = 0
     private var _binding: FragmentCharacterDetailsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CharacterDetailsViewModel by viewModels()
+    private val viewModel: CharacterDetailsViewModel by activityViewModels {
+        CharacterDetailsViewModelFactory(
+            (requireActivity().application as RickAndMortyApplication).database.characterDao,
+            (requireActivity().application as RickAndMortyApplication).database.episodeDao,
+        )
+    }
+    private val isConnected get() = Utils.isConnectedToNetwork(requireContext())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let { id = it.getInt("id") }
-        viewModel.getCharacter(id)
+        viewModel.getCharacter(id, isConnected)
     }
 
     override fun onCreateView(
@@ -47,31 +54,32 @@ class CharacterDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = EpisodeListAdapter()
         adapter.onClick = {
-            val action = CharacterDetailsFragmentDirections.actionCharacterDetailsFragmentToEpisodeDetailsFragment(it.id)
+            val action = CharacterDetailsFragmentDirections
+                .actionCharacterDetailsFragmentToEpisodeDetailsFragment(it.id)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
         observeCharacter()
         observeAppearances()
 
+        if (!isConnected)
+            binding.characterAppearances.append(getText(R.string.inaccurate_data_no_internet))
+
         super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun observeCharacter(){
-        lifecycleScope.launch{
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.responseCharacterState.collect{ state ->
+    private fun observeCharacter() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.responseCharacterState.collect { state ->
                     binding.progressCircularMain.isVisible = state is DataState.Loading
                     when (state) {
-                        is DataState.Success -> {
-                            showCharacter(state.data)
-                            cancel("Successful")
-                        }
+                        is DataState.Success -> showCharacter(state.data)
 
-                        is DataState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.exception)
-                            cancel("Error", state.exception)
-                        }
+                        is DataState.Error -> Utils.onErrorResponse(
+                            requireContext(),
+                            state.exception
+                        )
 
                         else -> Unit
                     }
@@ -80,7 +88,7 @@ class CharacterDetailsFragment : Fragment() {
         }
     }
 
-    private fun showCharacter(character: Character){
+    private fun showCharacter(character: Character) {
         (requireActivity() as AppCompatActivity).supportActionBar?.title = character.name
 
         binding.characterName.text = character.name
@@ -120,7 +128,7 @@ class CharacterDetailsFragment : Fragment() {
             resources.getString(R.string.character_location, character.location.name),
             Html.FROM_HTML_MODE_LEGACY
         )
-        if (character.location.name != "unknown"){
+        if (character.location.name != "unknown") {
             binding.characterLocation.setOnClickListener {
                 val action = CharacterDetailsFragmentDirections
                     .actionCharacterDetailsFragmentToLocationDetailsFragment(
@@ -133,20 +141,21 @@ class CharacterDetailsFragment : Fragment() {
         binding.characterAppearances.isVisible = true
     }
 
-    private fun observeAppearances(){
-        lifecycleScope.launch{
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.responseEpisodesState.collect{ state ->
+    private fun observeAppearances() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.responseEpisodesState.collect { state ->
                     binding.progressCircularSub.isVisible = state is DataState.Loading
                     when (state) {
-                        is DataState.Success -> {
-                            (binding.recyclerView.adapter as EpisodeListAdapter).data = state.data.toMutableList()
-                            cancel("Success")
-                        }
-                        is DataState.Error -> {
-                            Utils.onErrorResponse(requireContext(), state.exception)
-                            cancel("Error", state.exception)
-                        }
+                        is DataState.Success ->
+                            (binding.recyclerView.adapter as EpisodeListAdapter).data =
+                                state.data.toMutableList()
+
+                        is DataState.Error -> Utils.onErrorResponse(
+                            requireContext(),
+                            state.exception
+                        )
+
                         else -> Unit
                     }
                 }

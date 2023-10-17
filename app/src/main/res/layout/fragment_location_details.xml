@@ -39,15 +39,15 @@
 
     <TextView
         android:id="@+id/location_residents"
-        android:visibility="gone"
-        tools:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_s"
         android:text="@string/location_residents"
         android:textSize="@dimen/details_text"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/location_type"
-        app:layout_constraintTop_toBottomOf="@id/location_dimension" />
+        app:layout_constraintTop_toBottomOf="@id/location_dimension"
+        tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -67,13 +67,14 @@
         android:id="@+id/location_residents_none"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_s"
-        android:textSize="@dimen/details_text"
         android:text="@string/none"
+        android:textSize="@dimen/details_big_text"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/location_residents"
-        app:layout_constraintStart_toEndOf="@+id/location_residents"
-        app:layout_constraintTop_toTopOf="@+id/location_residents" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/location_residents"
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progress_circular_main"
