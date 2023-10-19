@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.EpisodeListAdapter
-import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
+import com.example.rickandmortyapiproject.databinding.FragmentEpisodesListBinding
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.EpisodesViewModel
@@ -26,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class EpisodesFragment : Fragment() {
 
-    private var _binding: FragmentRecyclerListBinding? = null
+    private var _binding: FragmentEpisodesListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: EpisodesViewModel by activityViewModels {
         EpisodesViewModelFactory(
@@ -35,14 +36,17 @@ class EpisodesFragment : Fragment() {
     }
     private val adapter = EpisodeListAdapter()
     private var isLoading: Boolean
-        get() = binding.progressCircular.isVisible
+        get() = binding.recyclerLayout.progressCircular.isVisible
         set(value) {
-            binding.progressCircular.isVisible = value
+            binding.recyclerLayout.progressCircular.isVisible = value
         }
     private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
     private var replaceData = false
     private var isObserving = false
     private val isConnected get() = Utils.isConnectedToNetwork(requireContext())
+
+    val name get() = binding.episodeNameEdittext.text.toString()
+    val episode get() = binding.episodeCodeEdittext.text.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +59,7 @@ class EpisodesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecyclerListBinding.inflate(inflater, container, false)
+        _binding = FragmentEpisodesListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -65,11 +69,11 @@ class EpisodesFragment : Fragment() {
                 .actionNavigationEpisodesToEpisodeDetailsFragment(it.id)
             findNavController().navigate(action)
         }
-        binding.recyclerView.adapter = adapter
+        binding.recyclerLayout.recyclerView.adapter = adapter
 
         if (!isObserving) observeEpisodes()
 
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.recyclerLayout.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager!! as GridLayoutManager
@@ -89,8 +93,24 @@ class EpisodesFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             replaceData = true
-            viewModel.get()
+            viewModel.get(name, episode)
             binding.swipeRefresh.isRefreshing = false
+        }
+
+        binding.searchButton.setOnClickListener {
+            if (!isConnected)
+                Toast.makeText(
+                    requireContext(),
+                    R.string.inaccurate_data_no_internet,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            replaceData = true
+
+            if (isConnected)
+                viewModel.get(name, episode)
+            else
+                viewModel.getFromDB(name, episode)
         }
 
         super.onViewCreated(view, savedInstanceState)
@@ -105,11 +125,13 @@ class EpisodesFragment : Fragment() {
                     isLoading = state is DataState.Loading
                     when (state) {
                         is DataState.Success -> {
-                            Log.i("EpisodesList", "observer success")
-                            if (state.data.isEmpty()) {
-                                Utils.showAlertDialog(requireContext(), R.string.no_cached_data)
-                                return@collect
-                            }
+                            Log.i("EpisodesList", "observer success load: ${state.data}")
+                            if (state.data.isEmpty() && !isConnected)
+                                binding.recyclerLayout.textAlert.setText(R.string.no_cached_data)
+                            else if (state.data.isEmpty())
+                                binding.recyclerLayout.textAlert.setText(R.string.no_results)
+                            else
+                                binding.recyclerLayout.textAlert.text = null
 
                             if (replaceData) adapter.data = state.data.toMutableList()
                             else adapter.addData(state.data)

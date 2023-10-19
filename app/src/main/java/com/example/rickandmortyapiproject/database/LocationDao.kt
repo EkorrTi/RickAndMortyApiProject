@@ -13,14 +13,14 @@ interface LocationDao {
 
     @Query(
         """SELECT * FROM location
-        WHERE (:name IS NULL OR name LIKE :name)
-        AND (:type IS NULL OR type LIKE :type)
-        AND (:dimension IS NULL OR dimension LIKE :dimension)"""
+        WHERE (name LIKE :name)
+        AND (type LIKE :type)
+        AND (dimension LIKE :dimension)"""
     )
     suspend fun getAll(
-        name: String? = null,
-        type: String? = null,
-        dimension: String? = null
+        name: String,
+        type: String,
+        dimension: String
     ): List<Location>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

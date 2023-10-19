@@ -13,12 +13,12 @@ interface EpisodeDao {
 
     @Query(
         """SELECT * FROM episode 
-        WHERE (:name IS NULL OR name LIKE :name)
-        AND (:episode IS NULL OR episode LIKE :episode)"""
+        WHERE (name LIKE :name)
+        AND (episode LIKE :episode)"""
     )
     suspend fun getAll(
-        name: String? = null,
-        episode: String? = null
+        name: String,
+        episode: String
     ): List<Episode>
 
     @Query("SELECT * FROM episode WHERE id IN (:ids)")

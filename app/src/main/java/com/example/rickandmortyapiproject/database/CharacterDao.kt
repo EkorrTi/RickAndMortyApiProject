@@ -13,18 +13,18 @@ interface CharacterDao {
 
     @Query(
         """SELECT * FROM character
-        WHERE (:name IS NULL OR name LIKE :name)
-        AND (:status IS NULL OR status LIKE :status)
-        AND (:species IS NULL OR species LIKE :species)
-        AND (:type IS NULL OR type LIKE :type)
-        AND (:gender IS NULL OR gender LIKE :gender)
+        WHERE (name LIKE :name)
+        AND (status LIKE :status)
+        AND (species LIKE :species)
+        AND (type LIKE :type)
+        AND (gender LIKE :gender)
     """)
     suspend fun getAll(
-        name: String? = null,
-        status: String? = null,
-        species: String? = null,
-        type: String? = null,
-        gender: String? = null,
+        name: String,
+        status: String,
+        species: String,
+        type: String,
+        gender: String,
     ): List<Character>
 
     @Query("SELECT * FROM character WHERE id IN (:ids)")

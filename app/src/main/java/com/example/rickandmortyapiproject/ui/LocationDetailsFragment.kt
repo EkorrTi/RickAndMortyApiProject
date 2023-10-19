@@ -94,7 +94,7 @@ class LocationDetailsFragment : Fragment() {
 
         binding.locationName.text = loc.name
         binding.locationType.text = Html.fromHtml(
-            getString(R.string.type, loc.type),
+            getString(R.string.character_type, loc.type),
             Html.FROM_HTML_MODE_LEGACY
         )
         binding.locationDimension.text = Html.fromHtml(

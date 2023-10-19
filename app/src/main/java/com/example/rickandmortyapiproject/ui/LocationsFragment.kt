@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmortyapiproject.R
 import com.example.rickandmortyapiproject.RickAndMortyApplication
 import com.example.rickandmortyapiproject.adapters.LocationListAdapter
-import com.example.rickandmortyapiproject.databinding.FragmentRecyclerListBinding
+import com.example.rickandmortyapiproject.databinding.FragmentLocationsListBinding
 import com.example.rickandmortyapiproject.util.DataState
 import com.example.rickandmortyapiproject.util.Utils
 import com.example.rickandmortyapiproject.viewmodels.LocationsViewModel
@@ -26,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class LocationsFragment : Fragment() {
 
-    private var _binding: FragmentRecyclerListBinding? = null
+    private var _binding: FragmentLocationsListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LocationsViewModel by activityViewModels {
         LocationsViewModelFactory(
@@ -35,14 +36,18 @@ class LocationsFragment : Fragment() {
     }
     private val adapter = LocationListAdapter()
     private var isLoading: Boolean
-        get() = binding.progressCircular.isVisible
+        get() = binding.recyclerLayout.progressCircular.isVisible
         set(value) {
-            binding.progressCircular.isVisible = value
+            binding.recyclerLayout.progressCircular.isVisible = value
         }
     private val isLastPage get() = viewModel.nextUrl.isNullOrBlank()
     private var replaceData = false
     private var isObserving = false
     private val isConnected get() = Utils.isConnectedToNetwork(requireContext())
+
+    val name get() = binding.locationNameEdittext.text.toString()
+    val type get() = binding.locationTypeEdittext.text.toString()
+    val dimension get() = binding.locationDimensionEdittext.text.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +60,7 @@ class LocationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecyclerListBinding.inflate(inflater, container, false)
+        _binding = FragmentLocationsListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -65,10 +70,11 @@ class LocationsFragment : Fragment() {
                 .actionNavigationLocationsToLocationDetailsFragment(it.id)
             findNavController().navigate(action)
         }
-        binding.recyclerView.adapter = adapter
+        binding.recyclerLayout.recyclerView.adapter = adapter
         if (!isObserving) observeLocations()
 
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.recyclerLayout.recyclerView.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager!! as GridLayoutManager
@@ -88,27 +94,46 @@ class LocationsFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             replaceData = true
-            viewModel.get()
+            viewModel.get(name, type, dimension)
             binding.swipeRefresh.isRefreshing = false
+        }
+
+        binding.searchButton.setOnClickListener {
+            if (!isConnected)
+                Toast.makeText(
+                    requireContext(),
+                    R.string.inaccurate_data_no_internet,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+
+            replaceData = true
+
+            if (isConnected)
+                viewModel.get(name, type, dimension)
+            else
+                viewModel.getFromDB(name, type, dimension)
         }
 
         super.onViewCreated(view, savedInstanceState)
     }
 
     private fun observeLocations() {
-        Log.i("EpisodesList", "started an observer")
+        Log.i("LocationsList", "started an observer")
         isObserving = true
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseState.collect { state ->
                     isLoading = state is DataState.Loading
                     when (state) {
                         is DataState.Success -> {
-                            Log.i("EpisodesList", "observer success")
-                            if (state.data.isEmpty()){
-                                Utils.showAlertDialog(requireContext(), R.string.no_cached_data)
-                                return@collect
-                            }
+                            Log.i("LocationsList", "observer success load: ${state.data}")
+                            if (state.data.isEmpty() && !isConnected)
+                                binding.recyclerLayout.textAlert.setText(R.string.no_cached_data)
+                            else if (state.data.isEmpty())
+                                binding.recyclerLayout.textAlert.setText(R.string.no_results)
+                            else
+                                binding.recyclerLayout.textAlert.text = null
 
                             if (replaceData) adapter.data = state.data.toMutableList()
                             else adapter.addData(state.data)
@@ -118,7 +143,10 @@ class LocationsFragment : Fragment() {
 
                         is DataState.Error -> {
                             if (!isConnected)
-                                Utils.showAlertDialog(requireContext(), R.string.no_internet_exception)
+                                Utils.showAlertDialog(
+                                    requireContext(),
+                                    R.string.no_internet_exception
+                                )
                             else
                                 Utils.onErrorResponse(requireContext(), state.exception)
                         }

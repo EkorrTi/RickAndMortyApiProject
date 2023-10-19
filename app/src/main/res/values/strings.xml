@@ -6,7 +6,7 @@
     <string name="character_image">Character image</string>
     <string name="character_species">&lt;b>Species:&lt;/b> %s</string>
     <string name="character_status">&lt;b>Status:&lt;/b> %s</string>
-    <string name="type">&lt;b>Type:&lt;/b> %s</string>
+    <string name="character_type">&lt;b>Type:&lt;/b> %s</string>
     <string name="character_type_standard"><b>Type:</b> Standard</string>
     <string name="character_gender">&lt;b>Gender:&lt;/b> %s</string>
     <string name="character_origin">&lt;b>Origin:&lt;/b> &lt;u>%s&lt;/u></string>
@@ -25,4 +25,11 @@
     <string name="no_cached_data">No data is available, please connect to internet first</string>
     <string name="inaccurate_data_no_internet"><small>data may be inaccurate, consider getting internet connection</small></string>
     <string name="none">None </string>
+    <string name="no_results">No results</string>
+    <string name="search">Search</string>
+    <string name="characters_name">Characters Name</string>
+    <string name="species">Species</string>
+    <string name="type">Type</string>
+    <string name="dimension">Dimension</string>
+    <string name="name">Name</string>
 </resources>

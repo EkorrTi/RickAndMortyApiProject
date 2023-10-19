@@ -23,7 +23,7 @@ class LocationListAdapter: RecyclerView.Adapter<LocationListAdapter.LocationList
         holder.apply {
             name.text = loc.name
             type.text = Html.fromHtml(
-                this.itemView.context.getString(R.string.type, loc.type),
+                this.itemView.context.getString(R.string.character_type, loc.type),
                 Html.FROM_HTML_MODE_LEGACY
             )
             dimension.text = Html.fromHtml(

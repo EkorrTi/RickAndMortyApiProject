@@ -11,6 +11,7 @@ import com.example.rickandmortyapiproject.util.DataState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 private const val TAG = "EpisodesListViewModel"
 
@@ -20,14 +21,17 @@ class EpisodesViewModel(private val episodeDao: EpisodeDao): ViewModel() {
     var nextUrl: String? = null
 
     fun getFromDB(
-        name: String? = null,
-        episode: String? = null
+        name: String = "",
+        episode: String = ""
     ) {
         viewModelScope.launch {
             Log.i(TAG, "Fetching from database")
             _responseState.value = DataState.Loading
             _responseState.value = DataState.Success(
-                episodeDao.getAll(name, episode)
+                episodeDao.getAll(
+                    "%$name%",
+                    "%$episode%"
+                )
             )
         }
     }
@@ -49,7 +53,10 @@ class EpisodesViewModel(private val episodeDao: EpisodeDao): ViewModel() {
                 Log.i(TAG, responseState.value.toString())
             } catch (e: Exception){
                 Log.w(TAG, e)
-                _responseState.value = DataState.Error(e)
+                if (e is HttpException && e.code() == 404)
+                    _responseState.value = DataState.Success(emptyList())
+                else
+                    _responseState.value = DataState.Error(e)
             }
         }
     }
